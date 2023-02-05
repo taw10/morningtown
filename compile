@@ -1,0 +1,10 @@
+#!/bin/sh
+
+export PICO_SDK_PATH=/mnt/datassd/2023/pico/pico-sdk/
+rm -rf build
+mkdir build
+cd build
+cmake ..
+cd ..
+make -C build
+
