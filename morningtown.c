@@ -73,5 +73,7 @@ int main()
 
 	rtc_set_alarm(&alarm, &alarm_callback);
 
-	while (1);
+	while (1) {
+		sleep_ms(1000);
+	}
 }
