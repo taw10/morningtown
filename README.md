@@ -36,6 +36,7 @@ You'll need a Raspberry Pi Pico W.  Solder red and green LEDs to GPIOs 21 and
 22 respectively, each with a 1.5 kOhm series resistor (you won't need much
 brightness).  There is a ground pad conveniently placed between the two pins.
 
+![Circuit diagram](circuit.png)
 
 Software
 --------
