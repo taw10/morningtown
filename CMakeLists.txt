@@ -23,6 +23,7 @@ pico_add_extra_outputs(morningtown)
 
 target_compile_definitions(morningtown PRIVATE
                            WIFI_SSID=\"${WIFI_SSID}\"
-                           WIFI_PASSWORD=\"${WIFI_PASSWORD}\")
+                           WIFI_PASSWORD=\"${WIFI_PASSWORD}\"
+                           CYW43_HOST_NAME=\"morningtown\")
 
 target_include_directories(morningtown PRIVATE ${CMAKE_CURRENT_LIST_DIR})
