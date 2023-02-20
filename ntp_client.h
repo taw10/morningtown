@@ -26,6 +26,11 @@
 
 typedef struct NTP_T_ NTP_T;
 
+/* Set your offset from UTC here, in seconds
+ * UTC+1 = 3600
+ * Sorry, no automatic DST handling yet. */
+#define UTC_OFFSET_SEC 3600
+
 enum {
 	NTP_DNS_ERROR,
 	NTP_DNS_NO_ADDR,

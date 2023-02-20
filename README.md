@@ -42,7 +42,15 @@ Software
 --------
 
 Edit `compile` to set the path to the Pico SDK, as well as your WLAN name and
-password.  Run it, then copy `build/morningtown.uf2` to the Pico.
+password.
+
+Set your offset from UTC in ntp_client.h, e.g. for UTC+1:
+```
+#define UTC_OFFSET_SEC 3600
+```
+Sorry, no automatic DST handling yet.
+
+Run `compile`, then copy `build/morningtown.uf2` to the Pico.
 
 
 Boot up sequence

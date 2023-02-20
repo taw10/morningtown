@@ -56,7 +56,6 @@ typedef struct NTP_T_ {
 #define NTP_PORT 123
 #define NTP_DELTA 2208988800 // seconds between 1 Jan 1900 and 1 Jan 1970
 #define NTP_RESEND_TIME (10 * 1000)
-#define UTC_OFFSET_SEC 3600
 
 
 static void ntp_result(NTP_T *state, int status, time_t *result)
