@@ -24,6 +24,10 @@ All that you really need is an indicator of whether or not it's a sensible time
 to get up, or whether you should go back to sleep.  That's all that MorningTown
 will give you.
 
+In contrast to a clock radio or "artificial sunrise" lamp, there is no danger
+of disturbing any other beings who share the room and may run on different
+schedules.
+
 Obviously, you should set an audible alarm clock for important wake-up calls.
 But, in combination with regular sleep hygiene, two LEDs might be all you need
 to synchronise your sleep pattern!
@@ -36,19 +40,29 @@ You'll need a Raspberry Pi Pico W.  Solder red and green LEDs to GPIOs 21 and
 22 respectively, each with a 1.5 kOhm series resistor (you won't need much
 brightness).  There is a ground pad conveniently placed between the two pins.
 
-![Circuit diagram](circuit.png)
+![Circuit diagram](circuit.png)    ![Photo](photo.jpg)
+
+(Hopefully your soldering is a little neater than mine).
+
+You can use other GPIOs if you prefer - just change the definitions of
+`LED_RED` and `LED_GREEN` in `morningtown.c`.  The positions of 21 and 22 just
+happen to work well for the geometry of my own nightstand.
+
 
 Software
 --------
 
-Edit `compile` to set the path to the Pico SDK, as well as your WLAN name and
-password.
+Edit `compile` to set the path to the [Pico SDK](https://github.com/raspberrypi/pico-sdk),
+as well as your WLAN name and password.
 
-Set your offset from UTC in ntp_client.h, e.g. for UTC+1:
+Set your offset from UTC in `ntp_client.h`, e.g. if you live in time zone UTC+1:
 ```
 #define UTC_OFFSET_SEC 3600
 ```
-Sorry, no automatic DST handling yet.
+Sorry, there's no automatic handling of daylight savings yet.
+
+To set different wake-up times, edit routine `check_clock()` in
+`morningtown.c`.
 
 Run `compile`, then copy `build/morningtown.uf2` to the Pico.
 
@@ -56,8 +70,10 @@ Run `compile`, then copy `build/morningtown.uf2` to the Pico.
 Boot up sequence
 ----------------
 
+Connect the Pico to any USB power supply.  Afterwards:
+
 1. All three LEDs (red, green and the one on Pi board itself) light for 2
-   seconds.
+   seconds, then switch off.
 2. Board LED lights to indicate WLAN connection
 3. Flashing red LED indicates a problem.  It will try again shortly.
 4. Alternating red and green LEDs indicate successful NTP synchronisation.
@@ -86,6 +102,8 @@ MorningTown.  If not, see <http://www.gnu.org/licenses/>.
 
 About the name
 --------------
+
+It's like a railway signal for your sleep:
 
 > Somewhere there is sunshine  
 > Somewhere there is day  
