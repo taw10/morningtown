@@ -24,6 +24,7 @@
 
 #include <pico/stdlib.h>
 #include <hardware/rtc.h>
+#include <hardware/watchdog.h>
 #include <pico/cyw43_arch.h>
 
 #include "ntp_client.h"
@@ -134,6 +135,7 @@ int main()
 	cyw43_arch_enable_sta_mode();
 
 	stdio_init_all();
+	watchdog_enable(0x7fffff, 1);
 
 	cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
 	gpio_put(LED_RED, 1);
@@ -149,11 +151,13 @@ int main()
 	last_conn = 10;
 	while (1) {
 
+		watchdog_update();
+
 		int st = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
 		cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
 		                    !ntp_ok && (st == CYW43_LINK_JOIN));
 
-		if ( (st != CYW43_LINK_JOIN) && (last_conn > 10) ) {
+		if ( (st != CYW43_LINK_JOIN) && (last_conn > 100) ) {
 			cyw43_arch_wifi_connect_async(WIFI_SSID,
 			                              WIFI_PASSWORD,
 			                              CYW43_AUTH_WPA2_AES_PSK);
@@ -177,11 +181,7 @@ int main()
 		debug_print("tick\n");
 
 		last_conn += 1;
-		if ( ntp_ok ) {
-			sleep_ms(10000);
-		} else {
-			sleep_ms(1000);
-		}
+		sleep_ms(100);
 
 	}
 }
