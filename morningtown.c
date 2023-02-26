@@ -31,6 +31,7 @@
 
 #define LED_GREEN 21
 #define LED_RED 22
+#define TEST_BUTTON 16
 
 int ntp_sent = 0;
 int ntp_ok = 0;
@@ -128,8 +129,11 @@ int main()
 
 	gpio_init(LED_GREEN);
 	gpio_init(LED_RED);
+	gpio_init(TEST_BUTTON);
 	gpio_set_dir(LED_GREEN, GPIO_OUT);
 	gpio_set_dir(LED_RED, GPIO_OUT);
+	gpio_set_dir(TEST_BUTTON, GPIO_IN);
+	gpio_pull_up(TEST_BUTTON);
 
 	cyw43_arch_init();
 	cyw43_arch_enable_sta_mode();
@@ -177,6 +181,12 @@ int main()
 		}
 
 		ntp_poll(ntp_state);
+
+		if ( ntp_ok && !gpio_get(TEST_BUTTON) ) {
+			gpio_put(LED_GREEN, 1);
+		} else {
+			gpio_put(LED_GREEN, 0);
+		}
 
 		debug_print("tick\n");
 
