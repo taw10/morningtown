@@ -184,8 +184,6 @@ int main()
 
 		if ( ntp_ok && !gpio_get(TEST_BUTTON) ) {
 			gpio_put(LED_GREEN, 1);
-		} else {
-			gpio_put(LED_GREEN, 0);
 		}
 
 		debug_print("tick\n");
