@@ -152,7 +152,7 @@ int main()
 	rtc_init();
 
 	ntp_state = ntp_init(ntp_callback);
-	last_conn = 10;
+	last_conn = 200;
 	while (1) {
 
 		watchdog_update();
@@ -176,19 +176,15 @@ int main()
 		}
 
 		if ( ntp_ok ) {
-			debug_print("connected OK.  Checking clock..\n");
 			check_clock();
 		}
-
-		ntp_poll(ntp_state);
 
 		if ( ntp_ok && !gpio_get(TEST_BUTTON) ) {
 			gpio_put(LED_GREEN, 1);
 		}
 
-		debug_print("tick\n");
-
 		last_conn += 1;
+		cyw43_arch_poll();
 		sleep_ms(100);
 
 	}

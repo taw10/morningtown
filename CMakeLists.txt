@@ -17,7 +17,7 @@ add_executable(morningtown morningtown.c ntp_client.c)
 target_link_libraries(morningtown
                       pico_stdlib
                       hardware_rtc
-                      pico_cyw43_arch_lwip_threadsafe_background)
+                      pico_cyw43_arch_lwip_poll)
 
 pico_add_extra_outputs(morningtown)
 

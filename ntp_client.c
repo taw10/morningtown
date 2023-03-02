@@ -45,9 +45,6 @@ typedef struct NTP_T_ {
 	struct udp_pcb *ntp_pcb;
 	alarm_id_t ntp_resend_alarm;
 	void (*callback)(int status);
-	time_t utc;
-	int have_new_reply;
-	int last_status;
 } NTP_T;
 
 
@@ -58,14 +55,32 @@ typedef struct NTP_T_ {
 #define NTP_RESEND_TIME (10 * 1000)
 
 
+static void set_rtc(time_t iutc)
+{
+	time_t tv = iutc + UTC_OFFSET_SEC;
+	struct tm *utc = gmtime(&tv);
+	datetime_t t;
+
+	t.year = utc->tm_year + 1900;
+	t.month = utc->tm_mon + 1;
+	t.day = utc->tm_mday;
+	t.dotw = utc->tm_wday;
+	t.hour = utc->tm_hour;
+	t.min = utc->tm_min;
+	t.sec = utc->tm_sec;
+
+	debug_print("time is %i/%i/%i   %i   %i:%i:%i\n",
+	            t.year, t.month, t.day, t.dotw, t.hour, t.min, t.sec);
+
+	rtc_set_datetime(&t);
+}
+
+
 static void ntp_result(NTP_T *state, int status, time_t *result)
 {
 	debug_print("NTP result:\n");
-	state->have_new_reply = 1;
-	state->last_status = status;
 	if (status == NTP_REPLY_RECEIVED && result) {
 
-		state->utc = *result;
 		debug_print("yay!\n");
 
 		if ( state->ntp_resend_alarm > 0 ) {
@@ -73,10 +88,13 @@ static void ntp_result(NTP_T *state, int status, time_t *result)
 			state->ntp_resend_alarm = 0;
 		}
 
+		set_rtc(*result);
+
 	} else {
 		debug_print("other reply.\n");
 	}
 
+	state->callback(status);
 	state->dns_request_sent = false;
 }
 
@@ -158,7 +176,6 @@ NTP_T *ntp_init(void (*reply_func)(int))
 	if (!state) return NULL;
 
 	state->callback = reply_func;
-	state->have_new_reply = 0;
 
 	state->ntp_pcb = udp_new_ip_type(IPADDR_TYPE_ANY);
 	if (!state->ntp_pcb) {
@@ -195,33 +212,4 @@ void ntp_send_request(NTP_T *state)
 		 * (ERR_INPROGRESS means expect a callback) */
 		ntp_result(state, NTP_DNS_ERROR, NULL);
 	}
-}
-
-
-void ntp_poll(NTP_T *state)
-{
-	if ( !state->have_new_reply ) return;
-	state->have_new_reply = 0;
-
-	if ( state->last_status == NTP_REPLY_RECEIVED ) {
-
-		time_t tv = state->utc + UTC_OFFSET_SEC;
-		struct tm *utc = gmtime(&tv);
-		datetime_t t;
-
-		t.year = utc->tm_year + 1900;
-		t.month = utc->tm_mon + 1;
-		t.day = utc->tm_mday;
-		t.dotw = utc->tm_wday;
-		t.hour = utc->tm_hour;
-		t.min = utc->tm_min;
-		t.sec = utc->tm_sec;
-
-		debug_print("time is %i/%i/%i   %i   %i:%i:%i\n",
-		            t.year, t.month, t.day, t.dotw, t.hour, t.min, t.sec);
-
-		rtc_set_datetime(&t);
-
-	}
-	state->callback(state->last_status);
 }
