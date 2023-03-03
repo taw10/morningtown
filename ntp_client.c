@@ -117,6 +117,7 @@ static void ntp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 
 	} else {
 		state->err = 1;
+		state->ok = 0;
 	}
 	pbuf_free(p);
 }
@@ -151,6 +152,7 @@ static void ntp_dns_found(const char *hostname,
 	} else {
 		debug_print("NTP failed: DNS no address\n");
 		state->err = 1;
+		state->ok = 0;
 	}
 }
 
