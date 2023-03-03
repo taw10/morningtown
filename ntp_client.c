@@ -45,7 +45,7 @@ typedef struct NTP_T_ {
 	alarm_id_t send_alarm;
 	int err;
 	int ok;
-	int first;
+	int need_request;
 } NTP_T;
 
 
@@ -54,6 +54,7 @@ typedef struct NTP_T_ {
 #define NTP_PORT 123
 #define NTP_DELTA 2208988800 // seconds between 1 Jan 1900 and 1 Jan 1970
 #define NTP_RESEND_TIME (5 * 1000 * 1000)
+#define NTP_UPDATE_INTERVAL ((37*60*60 + 23*60 + 43)*1000)
 
 
 static void set_rtc(time_t iutc)
@@ -74,6 +75,14 @@ static void set_rtc(time_t iutc)
 	            t.year, t.month, t.day, t.dotw, t.hour, t.min, t.sec);
 
 	rtc_set_datetime(&t);
+}
+
+
+static int64_t request_handler(alarm_id_t id, void *user_data)
+{
+	NTP_T *state = (NTP_T*)user_data;
+	state->need_request = 1;
+	return 0;
 }
 
 
@@ -104,6 +113,8 @@ static void ntp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 		set_rtc(epoch);
 		state->err = 0;
 		state->ok = 1;
+		add_alarm_in_ms(NTP_UPDATE_INTERVAL, request_handler, state, false);
+
 	} else {
 		state->err = 1;
 	}
@@ -144,14 +155,13 @@ static void ntp_dns_found(const char *hostname,
 }
 
 
-
 static int64_t send_handler(alarm_id_t id, void *user_data)
 {
 	int err;
 	NTP_T *state = (NTP_T*)user_data;
 
-	if ( !state->first && !state->err ) return NTP_RESEND_TIME;
-	state->first = 0;
+	if ( !state->need_request && !state->err ) return NTP_RESEND_TIME;
+	state->need_request = 0;
 
 	cyw43_arch_lwip_begin();
 	err = dns_gethostbyname(NTP_SERVER,
@@ -178,7 +188,7 @@ NTP_T *ntp_init()
 
 	state->err = 0;
 	state->ok = 0;
-	state->first = 1;
+	state->need_request = 1;
 
 	state->ntp_pcb = udp_new_ip_type(IPADDR_TYPE_ANY);
 	if (!state->ntp_pcb) {
