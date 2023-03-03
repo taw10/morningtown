@@ -31,18 +31,9 @@ typedef struct NTP_T_ NTP_T;
  * Sorry, no automatic DST handling yet. */
 #define UTC_OFFSET_SEC 3600
 
-enum {
-	NTP_DNS_ERROR,
-	NTP_DNS_NO_ADDR,
-	NTP_REQUEST_SENT,
-	NTP_BAD_REPLY,
-	NTP_TIMEOUT,
-	NTP_REPLY_RECEIVED
-};
-
-extern NTP_T *ntp_init(void (*reply_func)(int));
-extern void ntp_send_request(NTP_T *state);
-extern void ntp_poll(NTP_T *state);
+extern NTP_T *ntp_init(void);
+extern int ntp_ok(NTP_T *state);
+extern int ntp_err(NTP_T *state);
 
 /* For verbose debugging, switch the commenting of these two lines.
  * .. and see CMakeLists.txt */

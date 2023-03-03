@@ -44,9 +44,12 @@ brightness).  There is a ground pad conveniently placed between the two pins.
 
 (Hopefully your soldering is a little neater than mine).
 
+Optionally solder a small button between GPIO 16 and GND.  This will be a test
+button for checking the device is working properly (not illustrated above).
+
 You can use other GPIOs if you prefer - just change the definitions of
-`LED_RED` and `LED_GREEN` in `morningtown.c`.  The positions of 21 and 22 just
-happen to work well for the geometry of my own nightstand.
+`LED_RED`, `LED_GREEN` and `TEST_BUTTON` in `morningtown.c`.  The positions of
+16, 21 and 22 just happen to work well for the geometry of my own nightstand.
 
 
 Software
@@ -67,17 +70,20 @@ To set different wake-up times, edit routine `check_clock()` in
 Run `compile`, then copy `build/morningtown.uf2` to the Pico.
 
 
-Boot up sequence
-----------------
+Operation
+---------
 
-Connect the Pico to any USB power supply.  Afterwards:
+Connect the Pico to any USB power supply.  All three LEDs (red, green and the
+one on Pi board itself) will light briefly.  The device will then attempt to
+connect to the WLAN and synchronise its clock.  During this phase, the red LED
+will be lit continuously and the board LED will light as long as the WLAN is
+connected.  Once an NTP reply is received, all the LEDs will go dark until
+morning.
 
-1. All three LEDs (red, green and the one on Pi board itself) light for 2
-   seconds, then switch off.
-2. Board LED lights to indicate WLAN connection
-3. Flashing red LED indicates a problem.  It will try again shortly.
-4. Alternating red and green LEDs indicate successful NTP synchronisation.
-5. All LEDs turn off.  Everything dark until morning.
+When the (optional) test button is pressed (and held), the board LED will
+indicate a current WLAN connection, the green LED will indicate that NTP is
+synchronised, and the red LED (hopefully not lit) indicates some kind of error
+condition.
 
 
 Licence

@@ -33,91 +33,21 @@
 #define LED_RED 22
 #define TEST_BUTTON 16
 
-int ntp_sent = 0;
-int ntp_ok = 0;
 
-
-static void flash_red(int n)
-{
-	int i;
-
-	gpio_put(LED_GREEN, 0);
-	for ( i=0; i<10; i++ ) {
-		gpio_put(LED_RED, 1);
-		sleep_ms(100);
-		gpio_put(LED_RED, 0);
-		sleep_ms(100);
-	}
-}
-
-
-static void celebrate()
-{
-	int i;
-
-	for ( i=0; i<10; i++ ) {
-		gpio_put(LED_RED, 1);
-		gpio_put(LED_GREEN, 0);
-		sleep_ms(300);
-		gpio_put(LED_RED, 0);
-		gpio_put(LED_GREEN, 1);
-		sleep_ms(300);
-	}
-
-	gpio_put(LED_GREEN, 0);
-	gpio_put(LED_RED, 0);
-}
-
-
-static void check_clock()
+static void check_clock(int *pre_wake, int *wake_now)
 {
 	datetime_t t = {0};
 	rtc_get_datetime(&t);
 
 	if ( (t.hour == 7) && (t.min >= 15) ) {
-		gpio_put(LED_RED, 0);
-		gpio_put(LED_GREEN, 1);
+		*pre_wake = 1;
+		*wake_now = 0;
 	} else if ( (t.hour >= 8) && (t.hour < 12) ) {
-		gpio_put(LED_RED, 1);
-		gpio_put(LED_GREEN, 1);
+		*pre_wake = 0;
+		*wake_now = 1;
 	} else {
-		gpio_put(LED_RED, 0);
-		gpio_put(LED_GREEN, 0);
-	}
-}
-
-
-static void ntp_callback(int status)
-{
-	switch ( status ) {
-
-		case NTP_DNS_ERROR:
-		flash_red(5);
-		ntp_sent = 0;
-		break;
-
-		case NTP_DNS_NO_ADDR:
-		flash_red(10);
-		ntp_sent = 0;
-		break;
-
-		case NTP_BAD_REPLY:
-		flash_red(15);
-		ntp_sent = 0;
-		break;
-
-		case NTP_TIMEOUT:
-		flash_red(20);
-		ntp_sent = 0;
-		break;
-
-		case NTP_REQUEST_SENT:
-		break;
-
-		case NTP_REPLY_RECEIVED:
-		celebrate();
-		ntp_ok = 1;
-		break;
+		*pre_wake = 0;
+		*wake_now = 0;
 	}
 }
 
@@ -126,6 +56,8 @@ int main()
 {
 	NTP_T *ntp_state;
 	int last_conn;
+	int pre_wake = 0;
+	int wake_now = 0;
 
 	gpio_init(LED_GREEN);
 	gpio_init(LED_RED);
@@ -151,15 +83,13 @@ int main()
 
 	rtc_init();
 
-	ntp_state = ntp_init(ntp_callback);
+	ntp_state = ntp_init();
 	last_conn = 200;
 	while (1) {
 
 		watchdog_update();
 
 		int st = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
-		cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
-		                    !ntp_ok && (st == CYW43_LINK_JOIN));
 
 		if ( (st != CYW43_LINK_JOIN) && (last_conn > 100) ) {
 			cyw43_arch_wifi_connect_async(WIFI_SSID,
@@ -169,18 +99,30 @@ int main()
 			last_conn = 0;
 		}
 
-		if ( (st == CYW43_LINK_JOIN) && !ntp_sent ) {
-			ntp_send_request(ntp_state);
-			debug_print("sending NTP request\n");
-			ntp_sent = 1;
+		if ( ntp_ok(ntp_state) ) {
+			check_clock(&pre_wake, &wake_now);
 		}
 
-		if ( ntp_ok ) {
-			check_clock();
-		}
-
-		if ( ntp_ok && !gpio_get(TEST_BUTTON) ) {
-			gpio_put(LED_GREEN, 1);
+		/* Determine the LED status */
+		if ( gpio_get(TEST_BUTTON) == 0 ) {
+			/* Button pressed */
+			gpio_put(LED_GREEN, ntp_ok(ntp_state));
+			gpio_put(LED_RED, ntp_err(ntp_state));
+			cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
+			                    (st == CYW43_LINK_JOIN));
+		} else {
+			if ( !ntp_ok(ntp_state) ) {
+				/* Booting up */
+				cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
+				                    (st == CYW43_LINK_JOIN));
+				gpio_put(LED_RED, 1);
+				gpio_put(LED_GREEN, 0);
+			} else {
+				/* Normal operation */
+				gpio_put(LED_GREEN, pre_wake || wake_now);
+				gpio_put(LED_RED, wake_now);
+				cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+			}
 		}
 
 		last_conn += 1;
