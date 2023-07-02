@@ -58,6 +58,7 @@ int main()
 	int last_conn;
 	int pre_wake = 0;
 	int wake_now = 0;
+	int initial_sync;
 
 	gpio_init(LED_GREEN);
 	gpio_init(LED_RED);
@@ -84,14 +85,15 @@ int main()
 	rtc_init();
 
 	ntp_state = ntp_init();
-	last_conn = 200;
+	last_conn = 20000;
+	initial_sync = 0;
 	while (1) {
 
 		watchdog_update();
 
 		int st = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
 
-		if ( (st != CYW43_LINK_JOIN) && (last_conn > 100) ) {
+		if ( (st != CYW43_LINK_JOIN) && (last_conn > 10000) ) {
 			cyw43_arch_wifi_connect_async(WIFI_SSID,
 			                              WIFI_PASSWORD,
 			                              CYW43_AUTH_WPA2_AES_PSK);
@@ -99,9 +101,8 @@ int main()
 			last_conn = 0;
 		}
 
-		if ( ntp_ok(ntp_state) ) {
-			check_clock(&pre_wake, &wake_now);
-		}
+		if ( ntp_ok(ntp_state) ) initial_sync = 1;
+		if ( initial_sync ) check_clock(&pre_wake, &wake_now);
 
 		/* Determine the LED status */
 		if ( gpio_get(TEST_BUTTON) == 0 ) {
@@ -111,18 +112,10 @@ int main()
 			cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
 			                    (st == CYW43_LINK_JOIN));
 		} else {
-			if ( !ntp_ok(ntp_state) ) {
-				/* Booting up */
-				cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
-				                    (st == CYW43_LINK_JOIN));
-				gpio_put(LED_RED, 1);
-				gpio_put(LED_GREEN, 0);
-			} else {
-				/* Normal operation */
-				gpio_put(LED_GREEN, pre_wake || wake_now);
-				gpio_put(LED_RED, wake_now);
-				cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-			}
+			/* Normal operation */
+			gpio_put(LED_GREEN, pre_wake || wake_now);
+			gpio_put(LED_RED, wake_now);
+			cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
 		}
 
 		last_conn += 1;
