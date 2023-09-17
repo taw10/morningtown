@@ -52,8 +52,14 @@ typedef struct NTP_T_ {
 #define NTP_SERVER "pool.ntp.org"
 #define NTP_MSG_LEN 48
 #define NTP_PORT 123
-#define NTP_DELTA 2208988800 // seconds between 1 Jan 1900 and 1 Jan 1970
-#define NTP_RESEND_TIME (5 * 1000 * 1000)
+
+/* Seconds between 1 Jan 1900 and 1 Jan 1970 */
+#define NTP_DELTA 2208988800
+
+/* Interval between re-sending NTP requests (in MICROseconds) */
+#define NTP_RESEND_TIME (5 * 1000000)
+
+/* How long after a successful NTP sync to do another (in milliseconds) */
 #define NTP_UPDATE_INTERVAL ((37*60*60 + 23*60 + 43)*1000)
 
 
