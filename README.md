@@ -58,14 +58,12 @@ Software
 Edit `compile` to set the path to the [Pico SDK](https://github.com/raspberrypi/pico-sdk),
 as well as your WLAN name and password.
 
-Set your offset from UTC in `ntp_client.h`, e.g. if you live in time zone UTC+1:
-```
-#define UTC_OFFSET_SEC 3600
-```
-Sorry, there's no automatic handling of daylight savings yet.
-
-To set different wake-up times, edit routine `check_clock()` in
-`morningtown.c`.
+The wake-up times, as well as UTC offsets and DST changeover, are set in
+routine `check_clock()` in `morningtown.c`.  By default the calculations are
+set for central European time (UTC+1/UTC+2 with changeover on the last Sundays
+of March and October).  Unfortunately, a full local time library is far too big
+to fit on the Pico, so you will have to figure out the logic yourself for other
+time zones.
 
 Run `compile`, then copy `build/morningtown.uf2` to the Pico.
 

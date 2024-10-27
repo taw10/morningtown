@@ -26,11 +26,6 @@
 
 typedef struct NTP_T_ NTP_T;
 
-/* Set your offset from UTC here, in seconds
- * UTC+1 = 3600
- * Sorry, no automatic DST handling yet. */
-#define UTC_OFFSET_SEC 3600
-
 extern NTP_T *ntp_init(void);
 extern int ntp_ok(NTP_T *state);
 extern int ntp_err(NTP_T *state);

@@ -65,8 +65,7 @@ typedef struct NTP_T_ {
 
 static void set_rtc(time_t iutc)
 {
-	time_t tv = iutc + UTC_OFFSET_SEC;
-	struct tm *utc = gmtime(&tv);
+	struct tm *utc = gmtime(&iutc);
 	datetime_t t;
 
 	t.year = utc->tm_year + 1900;
