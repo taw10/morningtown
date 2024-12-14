@@ -38,31 +38,31 @@
  */
 static int last_sunday_in_march(time_t year)
 {
-	switch ( year ) {
-		case 2024: return 31;
-		case 2025: return 30;
-		case 2026: return 29;
-		case 2027: return 28;
-		case 2028: return 26;
-		case 2029: return 25;
-		case 2030: return 31;
-		default: return 28;  /* Guess! */
-	}
+    switch ( year ) {
+        case 2024: return 31;
+        case 2025: return 30;
+        case 2026: return 29;
+        case 2027: return 28;
+        case 2028: return 26;
+        case 2029: return 25;
+        case 2030: return 31;
+        default: return 28;  /* Guess! */
+    }
 }
 
 
 static int last_sunday_in_october(time_t year)
 {
-	switch ( year ) {
-		case 2024: return 27;
-		case 2025: return 26;
-		case 2026: return 25;
-		case 2027: return 31;
-		case 2028: return 29;
-		case 2029: return 28;
-		case 2030: return 27;
-		default: return 27;  /* Guess! */
-	}
+    switch ( year ) {
+        case 2024: return 27;
+        case 2025: return 26;
+        case 2026: return 25;
+        case 2027: return 31;
+        case 2028: return 29;
+        case 2029: return 28;
+        case 2030: return 27;
+        default: return 27;  /* Guess! */
+    }
 }
 
 
@@ -74,109 +74,109 @@ static int last_sunday_in_october(time_t year)
  */
 static int dst(datetime_t t)
 {
-	/* April to September inclusive.  Note Jan=0 */
-	if ( (t.month >= 3) && (t.month <= 8) ) return 1;
+    /* April to September inclusive.  Note Jan=0 */
+    if ( (t.month >= 3) && (t.month <= 8) ) return 1;
 
-	if ( (t.month == 2) && (t.day >= last_sunday_in_march(t.year)) ) return 1;
-	if ( (t.month == 9) && (t.day < last_sunday_in_october(t.year)) ) return 1;
+    if ( (t.month == 2) && (t.day >= last_sunday_in_march(t.year)) ) return 1;
+    if ( (t.month == 9) && (t.day < last_sunday_in_october(t.year)) ) return 1;
 
-	return 0;
+    return 0;
 }
 
 
 static void check_clock(int *pre_wake, int *wake_now)
 {
-	time_t dstoffs;
-	datetime_t t = {0};
-	rtc_get_datetime(&t);
+    time_t dstoffs;
+    datetime_t t = {0};
+    rtc_get_datetime(&t);
 
-	/* Time offsets for CET/CEST (Europe) */
-	dstoffs = dst(t) ? 2 : 1;
+    /* Time offsets for CET/CEST (Europe) */
+    dstoffs = dst(t) ? 2 : 1;
 
-	/* Set wakeup times here */
-	if ( (t.hour == 7-dstoffs) && (t.min >= 15) ) {
-		*pre_wake = 1;
-		*wake_now = 0;
-	} else if ( (t.hour >= 8-dstoffs) && (t.hour < 12) ) {
-		*pre_wake = 0;
-		*wake_now = 1;
-	} else {
-		*pre_wake = 0;
-		*wake_now = 0;
-	}
+    /* Set wakeup times here */
+    if ( (t.hour == 7-dstoffs) && (t.min >= 15) ) {
+        *pre_wake = 1;
+        *wake_now = 0;
+    } else if ( (t.hour >= 8-dstoffs) && (t.hour < 12) ) {
+        *pre_wake = 0;
+        *wake_now = 1;
+    } else {
+        *pre_wake = 0;
+        *wake_now = 0;
+    }
 
 }
 
 
 int main()
 {
-	NTP_T *ntp_state;
-	int last_conn;
-	int pre_wake = 0;
-	int wake_now = 0;
-	int initial_sync;
+    NTP_T *ntp_state;
+    int last_conn;
+    int pre_wake = 0;
+    int wake_now = 0;
+    int initial_sync;
 
-	gpio_init(LED_GREEN);
-	gpio_init(LED_RED);
-	gpio_init(TEST_BUTTON);
-	gpio_set_dir(LED_GREEN, GPIO_OUT);
-	gpio_set_dir(LED_RED, GPIO_OUT);
-	gpio_set_dir(TEST_BUTTON, GPIO_IN);
-	gpio_pull_up(TEST_BUTTON);
+    gpio_init(LED_GREEN);
+    gpio_init(LED_RED);
+    gpio_init(TEST_BUTTON);
+    gpio_set_dir(LED_GREEN, GPIO_OUT);
+    gpio_set_dir(LED_RED, GPIO_OUT);
+    gpio_set_dir(TEST_BUTTON, GPIO_IN);
+    gpio_pull_up(TEST_BUTTON);
 
-	cyw43_arch_init();
-	cyw43_arch_enable_sta_mode();
+    cyw43_arch_init();
+    cyw43_arch_enable_sta_mode();
 
-	stdio_init_all();
-	watchdog_enable(0x7fffff, 1);
+    stdio_init_all();
+    watchdog_enable(0x7fffff, 1);
 
-	cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-	gpio_put(LED_RED, 1);
-	gpio_put(LED_GREEN, 1);
-	sleep_ms(2000);
-	cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-	gpio_put(LED_RED, 0);
-	gpio_put(LED_GREEN, 0);
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+    gpio_put(LED_RED, 1);
+    gpio_put(LED_GREEN, 1);
+    sleep_ms(2000);
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+    gpio_put(LED_RED, 0);
+    gpio_put(LED_GREEN, 0);
 
-	rtc_init();
+    rtc_init();
 
-	ntp_state = ntp_init();
-	last_conn = 20000;
-	initial_sync = 0;
-	while (1) {
+    ntp_state = ntp_init();
+    last_conn = 20000;
+    initial_sync = 0;
+    while (1) {
 
-		watchdog_update();
+        watchdog_update();
 
-		int st = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
+        int st = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
 
-		if ( (st != CYW43_LINK_JOIN) && (last_conn > 10000) ) {
-			cyw43_arch_wifi_connect_async(WIFI_SSID,
-			                              WIFI_PASSWORD,
-			                              CYW43_AUTH_WPA2_AES_PSK);
-			debug_print("connecting to wifi...\n");
-			last_conn = 0;
-		}
+        if ( (st != CYW43_LINK_JOIN) && (last_conn > 10000) ) {
+            cyw43_arch_wifi_connect_async(WIFI_SSID,
+                    WIFI_PASSWORD,
+                    CYW43_AUTH_WPA2_AES_PSK);
+            debug_print("connecting to wifi...\n");
+            last_conn = 0;
+        }
 
-		if ( ntp_ok(ntp_state) ) initial_sync = 1;
-		if ( initial_sync ) check_clock(&pre_wake, &wake_now);
+        if ( ntp_ok(ntp_state) ) initial_sync = 1;
+        if ( initial_sync ) check_clock(&pre_wake, &wake_now);
 
-		/* Determine the LED status */
-		if ( gpio_get(TEST_BUTTON) == 0 ) {
-			/* Button pressed */
-			gpio_put(LED_GREEN, ntp_ok(ntp_state));
-			gpio_put(LED_RED, ntp_err(ntp_state));
-			cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
-			                    (st == CYW43_LINK_JOIN));
-		} else {
-			/* Normal operation */
-			gpio_put(LED_GREEN, pre_wake || wake_now);
-			gpio_put(LED_RED, wake_now);
-			cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-		}
+        /* Determine the LED status */
+        if ( gpio_get(TEST_BUTTON) == 0 ) {
+            /* Button pressed */
+            gpio_put(LED_GREEN, ntp_ok(ntp_state));
+            gpio_put(LED_RED, ntp_err(ntp_state));
+            cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
+                    (st == CYW43_LINK_JOIN));
+        } else {
+            /* Normal operation */
+            gpio_put(LED_GREEN, pre_wake || wake_now);
+            gpio_put(LED_RED, wake_now);
+            cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+        }
 
-		last_conn += 1;
-		cyw43_arch_poll();
-		sleep_ms(100);
+        last_conn += 1;
+        cyw43_arch_poll();
+        sleep_ms(100);
 
-	}
+    }
 }
