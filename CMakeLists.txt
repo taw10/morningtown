@@ -6,6 +6,7 @@ project(morningtown C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+option(DS3231 "Enable DS3231 RTC" OFF)
 option(USB_SERIAL "Enable serial console over USB (otherwise via UART)" ON)
 
 # Initialize the SDK
@@ -17,6 +18,11 @@ if (USB_SERIAL)
   pico_enable_stdio_usb(morningtown ENABLED)
 else()
   pico_enable_stdio_uart(morningtown ENABLED)
+endif()
+
+if (DS3231)
+  target_compile_definitions(morningtown PRIVATE HAVE_DS3231)
+  target_link_libraries(morningtown hardware_i2c)
 endif()
 
 target_link_libraries(morningtown
