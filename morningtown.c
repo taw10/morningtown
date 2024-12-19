@@ -35,7 +35,15 @@
 #include "ntp_client.h"
 #include "morningtown.h"
 
-#define LED_GREEN 21
+/* For cheap and cheerful hardware solution:
+ * #define LED_GREEN 21
+ * #define LED_RED 22
+ *
+ * For custom PCB:
+ * #define LED_GREEN 19
+ * #define LED_RED 22
+ */
+#define LED_GREEN 19
 #define LED_RED 22
 #define TEST_BUTTON 16
 
