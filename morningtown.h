@@ -1,13 +1,9 @@
 /*
- * ntp_client.h
+ * morningtown.h
  *
- * Copyright © 2023 Thomas White <taw@physics.org>
+ * Copyright © 2023-2024 Thomas White <taw@physics.org>
  *
  * This file is part of MorningTown
- *
- * Based on pico-examples/pico_w/ntp_client/picow_ntp_client.c
- * Original license: BSD-3-Clause
- * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * MorningTown is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +20,5 @@
  *
  */
 
-typedef struct NTP_T_ NTP_T;
-
-extern NTP_T *ntp_init(void);
-extern int ntp_ok(NTP_T *state);
-extern int ntp_err(NTP_T *state);
+//static void debug_print(const char *str, ...) {}
+#define debug_print printf

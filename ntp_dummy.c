@@ -1,7 +1,7 @@
 /*
- * ntp_client.h
+ * ntp_dummy.c
  *
- * Copyright © 2023 Thomas White <taw@physics.org>
+ * Copyright © 2024 Thomas White <taw@physics.org>
  *
  * This file is part of MorningTown
  *
@@ -24,8 +24,28 @@
  *
  */
 
-typedef struct NTP_T_ NTP_T;
+#include <stddef.h>
 
-extern NTP_T *ntp_init(void);
-extern int ntp_ok(NTP_T *state);
-extern int ntp_err(NTP_T *state);
+#include "ntp_client.h"
+
+
+typedef struct NTP_T_ {
+	int nothing;
+} NTP_T;
+
+
+NTP_T *ntp_init()
+{
+	return NULL;
+}
+
+int ntp_ok(NTP_T *state)
+{
+	return 1;
+}
+
+
+int ntp_err(NTP_T *state)
+{
+	return 0;
+}

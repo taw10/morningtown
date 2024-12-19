@@ -37,6 +37,7 @@
 #include "lwip/udp.h"
 
 #include "ntp_client.h"
+#include "morningtown.h"
 
 
 typedef struct NTP_T_ {

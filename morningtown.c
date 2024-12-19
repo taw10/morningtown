@@ -25,13 +25,20 @@
 #include <pico/stdlib.h>
 #include <hardware/rtc.h>
 #include <hardware/watchdog.h>
+#include <time.h>
+#include <stdio.h>
+
+#ifdef PICO_W
 #include <pico/cyw43_arch.h>
+#endif
 
 #include "ntp_client.h"
+#include "morningtown.h"
 
 #define LED_GREEN 21
 #define LED_RED 22
 #define TEST_BUTTON 16
+
 /* Hard-coded calculations because I can't be bothered to work out all the
  * special cases (leap years etc).  There's a decent chance that DST will have
  * been abolished in Europe by the time this table runs out, anyway.
@@ -124,20 +131,29 @@ int main()
     gpio_set_dir(TEST_BUTTON, GPIO_IN);
     gpio_pull_up(TEST_BUTTON);
 
+#ifdef PICO_W
     cyw43_arch_init();
     cyw43_arch_enable_sta_mode();
+#endif
 
     stdio_init_all();
     watchdog_enable(0x7fffff, 1);
 
+    debug_print("MorningTown initialising\n");
+
+#ifdef PICO_W
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+#endif
     gpio_put(LED_RED, 1);
     gpio_put(LED_GREEN, 1);
     sleep_ms(2000);
+#ifdef PICO_W
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+#endif
     gpio_put(LED_RED, 0);
     gpio_put(LED_GREEN, 0);
 
+    debug_print("Setting up RTC...\n");
     rtc_init();
 
     ntp_state = ntp_init();
@@ -147,6 +163,7 @@ int main()
 
         watchdog_update();
 
+#ifdef PICO_W
         int st = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
 
         if ( (st != CYW43_LINK_JOIN) && (last_conn > 10000) ) {
@@ -156,6 +173,7 @@ int main()
             debug_print("connecting to wifi...\n");
             last_conn = 0;
         }
+#endif
 
         if ( ntp_ok(ntp_state) ) initial_sync = 1;
         if ( initial_sync ) check_clock(&pre_wake, &wake_now);
@@ -165,17 +183,23 @@ int main()
             /* Button pressed */
             gpio_put(LED_GREEN, ntp_ok(ntp_state));
             gpio_put(LED_RED, ntp_err(ntp_state));
+#ifdef PICO_W
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
                     (st == CYW43_LINK_JOIN));
+#endif
         } else {
             /* Normal operation */
             gpio_put(LED_GREEN, pre_wake || wake_now);
             gpio_put(LED_RED, wake_now);
+#ifdef PICO_W
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+#endif
         }
 
         last_conn += 1;
+#ifdef PICO_W
         cyw43_arch_poll();
+#endif
         sleep_ms(100);
 
     }
