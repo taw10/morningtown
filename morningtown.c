@@ -226,12 +226,16 @@ int main()
     gpio_pull_up(5);
 #endif
 
+    /* Boot-up lightshow */
+    gpio_put(LED_RED, 1);
+    sleep_ms(500);
+    gpio_put(LED_GREEN, 1);
 #ifdef PICO_W
+    sleep_ms(500);
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
 #endif
-    gpio_put(LED_RED, 1);
-    gpio_put(LED_GREEN, 1);
-    sleep_ms(2000);
+    sleep_ms(1000);
+
 #ifdef PICO_W
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
 #endif
