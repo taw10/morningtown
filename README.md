@@ -36,8 +36,8 @@ to synchronise your sleep pattern!
 Hardware
 --------
 
-You'll need a Raspberry Pi Pico W.  Solder red and green LEDs to GPIOs 21 and
-22 respectively, each with a 1.5 kOhm series resistor (you won't need much
+You'll need a Raspberry Pi Pico W.  Solder red and green LEDs to GPIOs 22 and
+21 respectively, each with a 1.5 kOhm series resistor (you won't need much
 brightness).  There is a ground pad conveniently placed between the two pins.
 
 ![Circuit diagram](circuit.png)    ![Photo](photo.jpg)
@@ -73,10 +73,7 @@ Operation
 
 Connect the Pico to any USB power supply.  All three LEDs (red, green and the
 one on Pi board itself) will light briefly.  The device will then attempt to
-connect to the WLAN and synchronise its clock.  During this phase, the red LED
-will be lit continuously and the board LED will light as long as the WLAN is
-connected.  Once an NTP reply is received, all the LEDs will go dark until
-morning.
+connect to the WLAN and synchronise its clock
 
 When the (optional) test button is pressed (and held), the board LED will
 indicate a current WLAN connection, the green LED will indicate that NTP is
