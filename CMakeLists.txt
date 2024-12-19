@@ -27,7 +27,9 @@ endif()
 
 target_link_libraries(morningtown
                       pico_stdlib
-                      hardware_rtc)
+                      hardware_rtc
+                      hardware_pwm)
+
 string(COMPARE EQUAL ${PICO_BOARD} "pico_w" _cmp)
 if (_cmp)
   target_sources(morningtown PRIVATE ntp_client.c)

@@ -25,6 +25,7 @@
 #include <pico/stdlib.h>
 #include <hardware/rtc.h>
 #include <hardware/watchdog.h>
+#include <hardware/pwm.h>
 #include <time.h>
 #include <stdio.h>
 
@@ -190,6 +191,15 @@ static void set_picortc_from_ds3231()
 }
 
 
+static void setup_pwm(int pin)
+{
+    gpio_set_function(pin, GPIO_FUNC_PWM);
+    uint slice_num = pwm_gpio_to_slice_num(pin);
+    pwm_config config = pwm_get_default_config();
+    pwm_config_set_clkdiv(&config, 4.f);
+    pwm_init(slice_num, &config, true);
+    pwm_set_gpio_level(pin, 0);
+}
 
 
 int main()
@@ -200,13 +210,14 @@ int main()
     int wake_now = 0;
     int initial_sync;
 
-    gpio_init(LED_GREEN);
-    gpio_init(LED_RED);
+    const int brightness = 65535;
+
     gpio_init(TEST_BUTTON);
-    gpio_set_dir(LED_GREEN, GPIO_OUT);
-    gpio_set_dir(LED_RED, GPIO_OUT);
     gpio_set_dir(TEST_BUTTON, GPIO_IN);
     gpio_pull_up(TEST_BUTTON);
+
+    setup_pwm(LED_GREEN);
+    setup_pwm(LED_RED);
 
 #ifdef PICO_W
     cyw43_arch_init();
@@ -227,9 +238,9 @@ int main()
 #endif
 
     /* Boot-up lightshow */
-    gpio_put(LED_RED, 1);
+    pwm_set_gpio_level(LED_RED, brightness);
     sleep_ms(500);
-    gpio_put(LED_GREEN, 1);
+    pwm_set_gpio_level(LED_GREEN, brightness);
 #ifdef PICO_W
     sleep_ms(500);
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
@@ -239,8 +250,8 @@ int main()
 #ifdef PICO_W
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
 #endif
-    gpio_put(LED_RED, 0);
-    gpio_put(LED_GREEN, 0);
+    pwm_set_gpio_level(LED_GREEN, 0);
+    pwm_set_gpio_level(LED_RED, 0);
 
     debug_print("Setting up RTC...\n");
     rtc_init();
@@ -271,16 +282,16 @@ int main()
         /* Determine the LED status */
         if ( gpio_get(TEST_BUTTON) == 0 ) {
             /* Button pressed */
-            gpio_put(LED_GREEN, ntp_ok(ntp_state));
-            gpio_put(LED_RED, ntp_err(ntp_state));
+            pwm_set_gpio_level(LED_GREEN, ntp_ok(ntp_state)?brightness:0);
+            pwm_set_gpio_level(LED_RED, ntp_err(ntp_state)?brightness:0);
 #ifdef PICO_W
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
                     (st == CYW43_LINK_JOIN));
 #endif
         } else {
             /* Normal operation */
-            gpio_put(LED_GREEN, pre_wake || wake_now);
-            gpio_put(LED_RED, wake_now);
+            pwm_set_gpio_level(LED_GREEN, (pre_wake||wake_now)?brightness:0);
+            pwm_set_gpio_level(LED_RED, wake_now?brightness:0);
 #ifdef PICO_W
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
 #endif
