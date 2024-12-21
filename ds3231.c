@@ -50,7 +50,7 @@ static int from_bcd(uint8_t n)
 }
 
 
-static void set_ds3231_from_picortc()
+void set_ds3231_from_picortc()
 {
     uint8_t buf[8];
     datetime_t t = {0};
@@ -70,11 +70,13 @@ static void set_ds3231_from_picortc()
 }
 
 
-static void set_picortc_from_ds3231()
+void set_picortc_from_ds3231()
 {
     uint8_t buf[7];
     datetime_t t;
 
+    buf[0] = 0x00;
+    i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
     i2c_read_blocking(i2c_default, 0x68, buf, 7, false);
 
     t.year = 2000+from_bcd(buf[6]);

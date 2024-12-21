@@ -1,5 +1,5 @@
 /*
- * ds3231.h
+ * terminal.h
  *
  * Copyright © 2024 Thomas White <taw@physics.org>
  *
@@ -20,7 +20,4 @@
  *
  */
 
-extern void ds3231_init(void);
-extern void ds3231_status(void);
-extern void set_picortc_from_ds3231(void);
-extern void set_ds3231_from_picortc(void);
+extern void terminal_init(void);

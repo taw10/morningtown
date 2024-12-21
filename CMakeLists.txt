@@ -12,7 +12,7 @@ option(USB_SERIAL "Enable serial console over USB (otherwise via UART)" ON)
 # Initialize the SDK
 pico_sdk_init()
 
-add_executable(morningtown morningtown.c)
+add_executable(morningtown morningtown.c terminal.c)
 
 if (USB_SERIAL)
   pico_enable_stdio_usb(morningtown ENABLED)

@@ -35,6 +35,7 @@
 
 #include "ntp_client.h"
 #include "morningtown.h"
+#include "terminal.h"
 #include "ds3231.h"
 
 /* For cheap and cheerful hardware solution:
@@ -183,7 +184,9 @@ int main()
 
     debug_print("Setting up RTC...\n");
     rtc_init();
-    //set_picortc_from_ds3231();
+    set_picortc_from_ds3231();
+
+    terminal_init();
 
     ntp_state = ntp_init();
     last_conn = 20000;
