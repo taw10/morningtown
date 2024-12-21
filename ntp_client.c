@@ -37,7 +37,6 @@
 #include "lwip/udp.h"
 
 #include "ntp_client.h"
-#include "morningtown.h"
 
 
 typedef struct NTP_T_ {
@@ -77,8 +76,8 @@ static void set_rtc(time_t iutc)
 	t.min = utc->tm_min;
 	t.sec = utc->tm_sec;
 
-	debug_print("time is %i/%i/%i   %i   %i:%i:%i\n",
-	            t.year, t.month, t.day, t.dotw, t.hour, t.min, t.sec);
+	printf("time is %i/%i/%i   %i   %i:%i:%i\n",
+            t.year, t.month, t.day, t.dotw, t.hour, t.min, t.sec);
 
 	rtc_set_datetime(&t);
 }
@@ -99,8 +98,8 @@ static void ntp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 	uint8_t mode = pbuf_get_at(p, 0) & 0x7;
 	uint8_t stratum = pbuf_get_at(p, 1);
 
-	debug_print("got UDP: %i %i\n", addr, state->ntp_server_address);
-	debug_print("port %i len %i mode %i stratum %i\n", port, p->tot_len, mode, stratum);
+	printf("got UDP: %i %i\n", addr, state->ntp_server_address);
+	printf("port %i len %i mode %i stratum %i\n", port, p->tot_len, mode, stratum);
 
 	if (ip_addr_cmp(addr, &state->ntp_server_address)
 	 && port == NTP_PORT
@@ -115,7 +114,7 @@ static void ntp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 		                            | seconds_buf[3];
 		uint32_t seconds_since_1970 = seconds_since_1900 - NTP_DELTA;
 		time_t epoch = seconds_since_1970;
-		debug_print("second since 1970 = %i\n", epoch);
+		printf("second since 1970 = %i\n", epoch);
 		set_rtc(epoch);
 		state->err = 0;
 		state->ok = 1;
@@ -132,7 +131,7 @@ static void ntp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 /* The real address must be in state->ntp_server_address by this point */
 static void ntp_request(NTP_T *state)
 {
-	debug_print("sending NTP UDP\n");
+	printf("sending NTP UDP\n");
 	cyw43_arch_lwip_begin();
 	struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT, NTP_MSG_LEN, PBUF_RAM);
 	uint8_t *req = (uint8_t *) p->payload;
@@ -151,12 +150,12 @@ static void ntp_dns_found(const char *hostname,
 {
 	NTP_T *state = (NTP_T*)arg;
 	if (ipaddr) {
-		debug_print("DNS ok (%i)\n", *ipaddr);
+		printf("DNS ok (%i)\n", *ipaddr);
 		state->ntp_server_address = *ipaddr;
 		state->err = 0;
 		ntp_request(state);
 	} else {
-		debug_print("NTP failed: DNS no address\n");
+		printf("NTP failed: DNS no address\n");
 		state->err = 1;
 		state->ok = 0;
 	}

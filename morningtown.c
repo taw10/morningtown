@@ -34,7 +34,6 @@
 #endif
 
 #include "ntp_client.h"
-#include "morningtown.h"
 #include "terminal.h"
 #include "ds3231.h"
 
@@ -162,7 +161,7 @@ int main()
     stdio_init_all();
     watchdog_enable(0x7fffff, 1);
 
-    debug_print("MorningTown initialising\n");
+    printf("MorningTown initialising\n");
 
     ds3231_init();
 
@@ -182,7 +181,7 @@ int main()
     pwm_set_gpio_level(LED_GREEN, 0);
     pwm_set_gpio_level(LED_RED, 0);
 
-    debug_print("Setting up RTC...\n");
+    printf("Setting up RTC...\n");
     rtc_init();
     set_picortc_from_ds3231();
 
@@ -202,7 +201,7 @@ int main()
             cyw43_arch_wifi_connect_async(WIFI_SSID,
                     WIFI_PASSWORD,
                     CYW43_AUTH_WPA2_AES_PSK);
-            debug_print("connecting to wifi...\n");
+            printf("connecting to wifi...\n");
             last_conn = 0;
         }
 #endif
