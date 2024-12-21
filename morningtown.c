@@ -33,12 +33,9 @@
 #include <pico/cyw43_arch.h>
 #endif
 
-#ifdef HAVE_DS3231
-#include <hardware/i2c.h>
-#endif
-
 #include "ntp_client.h"
 #include "morningtown.h"
+#include "ds3231.h"
 
 /* For cheap and cheerful hardware solution:
  * #define LED_GREEN 21
@@ -128,69 +125,6 @@ static void check_clock(int *pre_wake, int *wake_now)
 }
 
 
-static uint8_t to_bcd(int n)
-{
-    return (n/10)<<4 | (n%10);
-}
-
-
-static int from_bcd(uint8_t n)
-{
-    return ((n&0xf0)>>4)*10 + (n&0x0f);
-}
-
-
-static void set_ds3231_from_picortc()
-{
-#ifdef HAVE_DS3231
-    uint8_t buf[8];
-    datetime_t t = {0};
-
-    rtc_get_datetime(&t);
-
-    buf[0] = 0;
-    buf[1] = to_bcd(t.sec);
-    buf[2] = to_bcd(t.min);
-    buf[3] = to_bcd(t.hour);
-    buf[4] = t.dotw;
-    buf[5] = to_bcd(t.day);
-    buf[6] = to_bcd(t.month);
-    buf[7] = to_bcd(t.year%100);
-
-    i2c_write_blocking(i2c_default, 0x68, buf, 8, true);
-#endif
-}
-
-
-static void set_picortc_from_ds3231()
-{
-#ifdef HAVE_DS3231
-    uint8_t val = 0x00;
-    uint8_t buf[7];
-    datetime_t t;
-
-    i2c_read_blocking(i2c_default, 0x68, buf, 7, false);
-
-    t.year = 2000+from_bcd(buf[6]);
-    t.month = from_bcd(buf[5] & 0x1f);
-    t.day = from_bcd(buf[4]);
-    t.dotw = buf[3];
-    t.hour = from_bcd(buf[2]);
-    t.min = from_bcd(buf[1]);
-    t.sec = from_bcd(buf[0]);
-
-    rtc_set_datetime(&t);
-
-    int j;
-    printf("got ");
-    for ( j=0; j<7; j++ ) {
-        printf("%x ", buf[j]);
-    }
-    printf("\n");
-#endif
-}
-
-
 static void setup_pwm(int pin)
 {
     gpio_set_function(pin, GPIO_FUNC_PWM);
@@ -229,13 +163,7 @@ int main()
 
     debug_print("MorningTown initialising\n");
 
-#ifdef HAVE_DS3231
-    i2c_init(i2c0, 1000000);
-    gpio_set_function(4, GPIO_FUNC_I2C);
-    gpio_set_function(5, GPIO_FUNC_I2C);
-    gpio_pull_up(4);
-    gpio_pull_up(5);
-#endif
+    ds3231_init();
 
     /* Boot-up lightshow */
     pwm_set_gpio_level(LED_RED, brightness);
@@ -255,7 +183,7 @@ int main()
 
     debug_print("Setting up RTC...\n");
     rtc_init();
-    set_picortc_from_ds3231();
+    //set_picortc_from_ds3231();
 
     ntp_state = ntp_init();
     last_conn = 20000;

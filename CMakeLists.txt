@@ -23,6 +23,7 @@ endif()
 if (DS3231)
   target_compile_definitions(morningtown PRIVATE HAVE_DS3231)
   target_link_libraries(morningtown hardware_i2c)
+  target_sources(morningtown PRIVATE ds3231.c)
 endif()
 
 target_link_libraries(morningtown
