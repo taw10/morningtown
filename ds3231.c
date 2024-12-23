@@ -28,6 +28,32 @@
 #include <hardware/rtc.h>
 #include <hardware/i2c.h>
 
+
+uint8_t clear_bit(uint8_t byte, int bit)
+{
+    return (byte & ~(1<<bit));
+}
+
+
+static void clear_32khz_bit()
+{
+    uint8_t buf[2];
+    int r;
+
+    buf[0] = 0x0f;
+    i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
+    r = i2c_read_blocking(i2c_default, 0x68, buf, 1, false);
+    if ( r == PICO_ERROR_GENERIC ) {
+        printf("ds3231 not found\n");
+        return;
+    }
+
+    buf[1] = clear_bit(buf[0], 3);
+    buf[0] = 0x0f;
+    i2c_write_blocking(i2c_default, 0x68, buf, 2, false);
+}
+
+
 void ds3231_init()
 {
     i2c_init(i2c0, 1000000);
@@ -35,6 +61,8 @@ void ds3231_init()
     gpio_set_function(5, GPIO_FUNC_I2C);
     gpio_pull_up(4);
     gpio_pull_up(5);
+
+    clear_32khz_bit();
 }
 
 
