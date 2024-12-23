@@ -90,12 +90,18 @@ static void run_command(struct terminal *trm)
         set_ds3231_from_picortc();
     }
 
+    if ( strcmp(trm->c, "osf") == 0 ) {
+        ds3231_reset_osf();
+    }
+
     if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
         printf("  help   : Show this help message\n");
         printf("  tt     : Show Pico RTC date/time\n");
-        printf("  ds     : Show DS3231 date/time and status\n");
         printf("  set    : Set date/time\n");
+        printf("  ds     : Show DS3231 date/time and status\n");
+        printf("  setds  : Set DS3231 from Pico RTC\n");
+        printf("  osf    : Set DS3231 from Pico RTC\n");
     }
 }
 

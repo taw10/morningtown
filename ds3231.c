@@ -204,3 +204,22 @@ void ds3231_status()
     printf("Aging offset: %i\n", conv_signed(buf[16]));
     printf("Temperature: %f\n", conv_temp(buf[17], buf[18]));
 }
+
+
+void ds3231_reset_osf()
+{
+    uint8_t buf[2];
+    int r;
+
+    buf[0] = 0x0f;
+    i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
+    r = i2c_read_blocking(i2c_default, 0x68, buf, 1, false);
+    if ( r == PICO_ERROR_GENERIC ) {
+        printf("ds3231 not found\n");
+        return;
+    }
+
+    buf[1] = clear_bit(buf[0], 7);
+    buf[0] = 0x0f;
+    i2c_write_blocking(i2c_default, 0x68, buf, 2, false);
+}
