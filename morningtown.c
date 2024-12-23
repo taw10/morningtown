@@ -136,6 +136,12 @@ static void setup_pwm(int pin)
 }
 
 
+static int all_ok(NTP_T *ntp_state)
+{
+    return ntp_ok(ntp_state) && rtc_running();
+}
+
+
 int main()
 {
     NTP_T *ntp_state;
@@ -212,7 +218,7 @@ int main()
         /* Determine the LED status */
         if ( gpio_get(TEST_BUTTON) == 0 ) {
             /* Button pressed */
-            pwm_set_gpio_level(LED_GREEN, ntp_ok(ntp_state)?brightness:0);
+            pwm_set_gpio_level(LED_GREEN, all_ok(ntp_state)?brightness:0);
             pwm_set_gpio_level(LED_RED, ntp_err(ntp_state)?brightness:0);
 #ifdef PICO_W
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
