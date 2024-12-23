@@ -162,6 +162,9 @@ int main()
 #ifdef PICO_W
     cyw43_arch_init();
     cyw43_arch_enable_sta_mode();
+#else
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 #endif
 
     stdio_init_all();
@@ -175,14 +178,18 @@ int main()
     pwm_set_gpio_level(LED_RED, brightness);
     sleep_ms(500);
     pwm_set_gpio_level(LED_GREEN, brightness);
-#ifdef PICO_W
     sleep_ms(500);
+#ifdef PICO_W
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+#else
+    gpio_put(PICO_DEFAULT_LED_PIN, 1);
 #endif
     sleep_ms(1000);
 
 #ifdef PICO_W
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+#else
+    gpio_put(PICO_DEFAULT_LED_PIN, 0);
 #endif
     pwm_set_gpio_level(LED_GREEN, 0);
     pwm_set_gpio_level(LED_RED, 0);
