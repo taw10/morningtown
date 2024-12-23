@@ -56,6 +56,7 @@ static void set_clock(const char *str)
 
     } else {
         printf("Syntax: set <weekday> <day> <mon> <yyyy> <hour> <min> <sec>\n");
+        printf("Note: Time should be in UTC\n");
     }
 }
 
@@ -66,7 +67,7 @@ static void print_datetime()
     int r;
     r = rtc_get_datetime(&t);
     if ( r ) {
-        printf("Pico RTC date/time: %i-%i-%i (%i)  %i:%i:%i\n",
+        printf("Pico RTC date/time (UTC): %i-%i-%i (%i)  %i:%i:%i\n",
                t.day, t.month, t.year, t.dotw, t.hour, t.min, t.sec);
     } else {
         printf("Pico RTC not running.\n");
@@ -103,7 +104,7 @@ static void run_command(struct terminal *trm)
         printf("Commands:\n");
         printf("  help   : Show this help message\n");
         printf("  tt     : Show Pico RTC date/time\n");
-        printf("  set    : Set date/time\n");
+        printf("  set    : Set UTC date/time\n");
         printf("  ds     : Show DS3231 date/time and status\n");
         printf("  setds  : Set DS3231 from Pico RTC\n");
         printf("  osf    : Set DS3231 from Pico RTC\n");
