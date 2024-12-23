@@ -78,26 +78,26 @@ static void print_datetime()
 static void run_command(struct terminal *trm)
 {
     trm->c[trm->nchar] = '\0';
-    printf("\n   --> %s\n", trm->c);
+
+    if ( trm->nchar == 0 ) return;
 
     if ( strcmp(trm->c, "ds") == 0 ) {
         ds3231_status();
-    }
 
-    if ( strcmp(trm->c, "tt") == 0 ) {
+    } else if ( strcmp(trm->c, "tt") == 0 ) {
         print_datetime();
-    }
 
-    if ( strncmp(trm->c, "set ", 4) == 0 ) {
+    } else if ( strncmp(trm->c, "set ", 4) == 0 ) {
         set_clock(trm->c+4);
-    }
 
-    if ( strcmp(trm->c, "setds") == 0 ) {
+    } else if ( strcmp(trm->c, "setds") == 0 ) {
         set_ds3231_from_picortc();
-    }
 
-    if ( strcmp(trm->c, "osf") == 0 ) {
+    } else if ( strcmp(trm->c, "osf") == 0 ) {
         ds3231_reset_osf();
+
+    } else {
+        printf("Command not recognised.  Try 'help'\n");
     }
 
     if ( strcmp(trm->c, "help") == 0 ) {
