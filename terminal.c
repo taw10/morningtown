@@ -63,9 +63,14 @@ static void set_clock(const char *str)
 static void print_datetime()
 {
     datetime_t t = {0};
-    rtc_get_datetime(&t);
-    printf("Pico RTC date/time: %i-%i-%i (%i)  %i:%i:%i\n",
-            t.day, t.month, t.year, t.dotw, t.hour, t.min, t.sec);
+    int r;
+    r = rtc_get_datetime(&t);
+    if ( r ) {
+        printf("Pico RTC date/time: %i-%i-%i (%i)  %i:%i:%i\n",
+               t.day, t.month, t.year, t.dotw, t.hour, t.min, t.sec);
+    } else {
+        printf("Pico RTC not running.\n");
+    }
 }
 
 
