@@ -118,6 +118,7 @@ static void chars_avail(void *vp)
 
     i = getchar_timeout_us(0);
     if ( i == PICO_ERROR_TIMEOUT ) return;
+    if ( i == 0 ) return;
 
     if ( (i == 13) || (i == 10) ) {
         printf("\n");
