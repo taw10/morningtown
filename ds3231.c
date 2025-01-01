@@ -171,12 +171,6 @@ void ds3231_status()
         return;
     }
 
-    printf("DS3231 data received (%i bytes): ", r);
-    for ( j=0; j<r; j++ ) {
-        printf("%x ", buf[j]);
-    }
-    printf("\n");
-
     t.year = 2000+from_bcd(buf[6]);
     t.month = from_bcd(buf[5] & 0x1f);
     t.day = from_bcd(buf[4]);
