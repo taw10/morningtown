@@ -205,6 +205,7 @@ int main()
     ntp_state = ntp_init();
     last_conn = 20000;
     initial_sync = 0;
+    countdown = 100;
     while (1) {
 
         watchdog_update();
@@ -222,7 +223,13 @@ int main()
 #endif
 
         if ( ntp_ok(ntp_state) ) initial_sync = 1;
-        if ( initial_sync ) check_clock(&pre_wake, &wake_now);
+
+        /* Check clock every 10 seconds */
+        countdown--;
+        if ( countdown == 0 ) {
+            if ( initial_sync ) check_clock(&pre_wake, &wake_now);
+            countdown = 100;
+        }
 
         /* Determine the LED status */
         if ( gpio_get(TEST_BUTTON) == 0 ) {
