@@ -29,13 +29,15 @@
 #include <hardware/i2c.h>
 
 
+static int have_ds3231 = 0;
+
 uint8_t clear_bit(uint8_t byte, int bit)
 {
     return (byte & ~(1<<bit));
 }
 
 
-static void clear_32khz_bit()
+static int clear_32khz_bit()
 {
     uint8_t buf[2];
     int r;
@@ -45,12 +47,13 @@ static void clear_32khz_bit()
     r = i2c_read_blocking(i2c_default, 0x68, buf, 1, false);
     if ( r == PICO_ERROR_GENERIC ) {
         printf("ds3231 not found\n");
-        return;
+        return 0;
     }
 
     buf[1] = clear_bit(buf[0], 3);
     buf[0] = 0x0f;
     i2c_write_blocking(i2c_default, 0x68, buf, 2, false);
+    return 1;
 }
 
 
@@ -62,7 +65,7 @@ void ds3231_init()
     gpio_pull_up(4);
     gpio_pull_up(5);
 
-    clear_32khz_bit();
+    have_ds3231 = clear_32khz_bit();
 }
 
 
@@ -83,6 +86,8 @@ void set_ds3231_from_picortc()
     uint8_t buf[8];
     datetime_t t = {0};
 
+    if ( !have_ds3231 ) return;
+
     rtc_get_datetime(&t);
 
     buf[0] = 0;
@@ -102,6 +107,8 @@ void ds3231_get_datetime(datetime_t *t)
 {
     uint8_t buf[7];
 
+    if ( !have_ds3231 ) return;
+
     buf[0] = 0x00;
     i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
     i2c_read_blocking(i2c_default, 0x68, buf, 7, false);
@@ -119,7 +126,7 @@ void ds3231_get_datetime(datetime_t *t)
 void set_picortc_from_ds3231()
 {
     datetime_t t;
-
+    if ( !have_ds3231 ) return;
     ds3231_get_datetime(&t);
     rtc_set_datetime(&t);
 
