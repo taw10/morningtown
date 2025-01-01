@@ -96,11 +96,7 @@ static void run_command(struct terminal *trm)
     } else if ( strcmp(trm->c, "osf") == 0 ) {
         ds3231_reset_osf();
 
-    } else {
-        printf("Command not recognised.  Try 'help'\n");
-    }
-
-    if ( strcmp(trm->c, "help") == 0 ) {
+    } else if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
         printf("  help   : Show this help message\n");
         printf("  tt     : Show Pico RTC date/time\n");
@@ -108,7 +104,11 @@ static void run_command(struct terminal *trm)
         printf("  ds     : Show DS3231 date/time and status\n");
         printf("  setds  : Set DS3231 from Pico RTC\n");
         printf("  osf    : Set DS3231 from Pico RTC\n");
+
+    } else {
+        printf("Command not recognised.  Try 'help'\n");
     }
+
 }
 
 
