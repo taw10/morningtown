@@ -142,6 +142,16 @@ static int all_ok(NTP_T *ntp_state)
 }
 
 
+static void set_board_led(int level)
+{
+    #ifdef PICO_W
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, level);
+    #else
+    gpio_put(PICO_DEFAULT_LED_PIN, level);
+    #endif
+}
+
+
 int main()
 {
     NTP_T *ntp_state;
@@ -179,18 +189,10 @@ int main()
     sleep_ms(500);
     pwm_set_gpio_level(LED_GREEN, brightness);
     sleep_ms(500);
-#ifdef PICO_W
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-#else
-    gpio_put(PICO_DEFAULT_LED_PIN, 1);
-#endif
+    set_board_led(1);
     sleep_ms(1000);
 
-#ifdef PICO_W
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-#else
-    gpio_put(PICO_DEFAULT_LED_PIN, 0);
-#endif
+    set_board_led(0);
     pwm_set_gpio_level(LED_GREEN, 0);
     pwm_set_gpio_level(LED_RED, 0);
 
@@ -235,9 +237,7 @@ int main()
             /* Normal operation */
             pwm_set_gpio_level(LED_GREEN, (pre_wake||wake_now)?brightness:0);
             pwm_set_gpio_level(LED_RED, wake_now?brightness:0);
-#ifdef PICO_W
-            cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-#endif
+            set_board_led(0);
         }
 
         last_conn += 1;
