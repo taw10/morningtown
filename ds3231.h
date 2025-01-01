@@ -25,3 +25,4 @@ extern void ds3231_status(void);
 extern void ds3231_reset_osf(void);
 extern void set_picortc_from_ds3231(void);
 extern void set_ds3231_from_picortc(void);
+extern void ds3231_get_datetime(datetime_t *t);

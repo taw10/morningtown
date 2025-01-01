@@ -98,31 +98,31 @@ void set_ds3231_from_picortc()
 }
 
 
-void set_picortc_from_ds3231()
+void ds3231_get_datetime(datetime_t *t)
 {
     uint8_t buf[7];
-    datetime_t t;
 
     buf[0] = 0x00;
     i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
     i2c_read_blocking(i2c_default, 0x68, buf, 7, false);
 
-    t.year = 2000+from_bcd(buf[6]);
-    t.month = from_bcd(buf[5] & 0x1f);
-    t.day = from_bcd(buf[4]);
-    t.dotw = buf[3];
-    t.hour = from_bcd(buf[2]);
-    t.min = from_bcd(buf[1]);
-    t.sec = from_bcd(buf[0]);
+    t->year = 2000+from_bcd(buf[6]);
+    t->month = from_bcd(buf[5] & 0x1f);
+    t->day = from_bcd(buf[4]);
+    t->dotw = buf[3];
+    t->hour = from_bcd(buf[2]);
+    t->min = from_bcd(buf[1]);
+    t->sec = from_bcd(buf[0]);
+}
 
+
+void set_picortc_from_ds3231()
+{
+    datetime_t t;
+
+    ds3231_get_datetime(&t);
     rtc_set_datetime(&t);
 
-    int j;
-    printf("got ");
-    for ( j=0; j<7; j++ ) {
-        printf("%x ", buf[j]);
-    }
-    printf("\n");
 }
 
 
