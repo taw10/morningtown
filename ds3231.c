@@ -103,15 +103,19 @@ void set_ds3231_from_picortc()
 }
 
 
-void ds3231_get_datetime(datetime_t *t)
+int ds3231_get_datetime(datetime_t *t)
 {
     uint8_t buf[7];
+    int r;
 
-    if ( !have_ds3231 ) return;
+    if ( !have_ds3231 ) return 1;
 
     buf[0] = 0x00;
     i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
-    i2c_read_blocking(i2c_default, 0x68, buf, 7, false);
+    r = i2c_read_blocking(i2c_default, 0x68, buf, 7, false);
+    if ( r == PICO_ERROR_GENERIC ) {
+        return 1;
+    }
 
     t->year = 2000+from_bcd(buf[6]);
     t->month = from_bcd(buf[5] & 0x1f);
@@ -120,6 +124,8 @@ void ds3231_get_datetime(datetime_t *t)
     t->hour = from_bcd(buf[2]);
     t->min = from_bcd(buf[1]);
     t->sec = from_bcd(buf[0]);
+
+    return 0;
 }
 
 
