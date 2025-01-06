@@ -155,19 +155,15 @@ static void set_board_led(int level)
 int main()
 {
     NTP_T *ntp_state;
-    int last_conn;
+    int last_conn, countdown;
     int pre_wake = 0;
     int wake_now = 0;
     int initial_sync;
 
     const int brightness = 65535;
 
-    gpio_init(TEST_BUTTON);
-    gpio_set_dir(TEST_BUTTON, GPIO_IN);
-    gpio_pull_up(TEST_BUTTON);
-
-    setup_pwm(LED_GREEN);
-    setup_pwm(LED_RED);
+    stdio_init_all();
+    printf("MorningTown initialising\n");
 
 #ifdef PICO_W
     cyw43_arch_init();
@@ -177,27 +173,36 @@ int main()
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 #endif
 
-    stdio_init_all();
     watchdog_enable(0x7fffff, 1);
-
-    printf("MorningTown initialising\n");
-
+    rtc_init();
     ds3231_init();
 
-    /* Boot-up lightshow */
-    pwm_set_gpio_level(LED_RED, brightness);
-    sleep_ms(500);
-    pwm_set_gpio_level(LED_GREEN, brightness);
-    sleep_ms(500);
+    /* Board LED shows we're alive */
     set_board_led(1);
-    sleep_ms(1000);
 
+    gpio_init(TEST_BUTTON);
+    gpio_set_dir(TEST_BUTTON, GPIO_IN);
+    gpio_pull_up(TEST_BUTTON);
+
+    setup_pwm(LED_GREEN);
+    setup_pwm(LED_RED);
+
+    /* Red light indicates DS3231 */
+    if ( ds3231_found() ) {
+	pwm_set_gpio_level(LED_RED, brightness);
+    }
+
+    /* Green light indicates RP2040 RTC */
+    if ( rtc_running() ) {
+        pwm_set_gpio_level(LED_GREEN, brightness);
+    }
+
+    /* Wait, then turn everything off */
+    sleep_ms(2000);
     set_board_led(0);
     pwm_set_gpio_level(LED_GREEN, 0);
     pwm_set_gpio_level(LED_RED, 0);
 
-    printf("Setting up RTC...\n");
-    rtc_init();
     set_picortc_from_ds3231();
 
     terminal_init();

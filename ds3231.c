@@ -224,3 +224,9 @@ void ds3231_reset_osf()
     buf[0] = 0x0f;
     i2c_write_blocking(i2c_default, 0x68, buf, 2, false);
 }
+
+
+int ds3231_found()
+{
+    return have_ds3231;
+}
