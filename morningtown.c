@@ -161,7 +161,7 @@ int main()
     int last_conn, countdown;
     int pre_wake = 0;
     int wake_now = 0;
-    int initial_sync;
+    int time_ok = 0;
 
     const int brightness = 65535;
 
@@ -206,13 +206,14 @@ int main()
     pwm_set_gpio_level(LED_GREEN, 0);
     pwm_set_gpio_level(LED_RED, 0);
 
-    set_picortc_from_ds3231();
+    if ( !set_picortc_from_ds3231() ) {
+        time_ok = 1;
+    }
 
     terminal_init();
 
     ntp_state = ntp_init();
     last_conn = 20000;
-    initial_sync = 0;
     countdown = 100;
     while (1) {
 
@@ -230,12 +231,12 @@ int main()
         }
 #endif
 
-        if ( ntp_ok(ntp_state) ) initial_sync = 1;
+        if ( ntp_ok(ntp_state) ) time_ok = 1;
 
         /* Check clock every 10 seconds */
         countdown--;
         if ( countdown == 0 ) {
-            if ( initial_sync ) check_clock(&pre_wake, &wake_now);
+            if ( time_ok ) check_clock(&pre_wake, &wake_now);
             countdown = 100;
         }
 

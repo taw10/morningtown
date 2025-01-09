@@ -129,13 +129,13 @@ int ds3231_get_datetime(datetime_t *t)
 }
 
 
-void set_picortc_from_ds3231()
+int set_picortc_from_ds3231()
 {
     datetime_t t;
-    if ( !have_ds3231 ) return;
+    if ( !have_ds3231 ) return 1;
     ds3231_get_datetime(&t);
     rtc_set_datetime(&t);
-
+    return 0;
 }
 
 
