@@ -105,7 +105,10 @@ static void check_clock(int *pre_wake, int *wake_now)
 {
     time_t dstoffs;
     datetime_t t = {0};
-    rtc_get_datetime(&t);
+
+    if ( ds3231_get_datetime(&t) ) {
+        rtc_get_datetime(&t);
+    }
 
     /* Time offsets for CET/CEST (Europe) */
     dstoffs = dst(t) ? 2 : 1;
