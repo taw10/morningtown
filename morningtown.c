@@ -192,7 +192,7 @@ int main()
 
     /* Red light indicates DS3231 */
     if ( ds3231_found() ) {
-	pwm_set_gpio_level(LED_RED, brightness);
+        pwm_set_gpio_level(LED_RED, brightness);
     }
 
     /* Green light indicates RP2040 RTC */
