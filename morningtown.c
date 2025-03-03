@@ -46,6 +46,7 @@
  * #define LED_RED 22
  */
 #define LED_GREEN 19
+#define LED_BLUE 21
 #define LED_RED 22
 #define TEST_BUTTON 16
 
@@ -139,12 +140,6 @@ static void setup_pwm(int pin)
 }
 
 
-static int all_ok(NTP_T *ntp_state)
-{
-    return ntp_ok(ntp_state) && rtc_running();
-}
-
-
 static void set_board_led(int level)
 {
     #ifdef PICO_W
@@ -189,13 +184,22 @@ int main()
 
     setup_pwm(LED_GREEN);
     setup_pwm(LED_RED);
+    setup_pwm(LED_BLUE);
+
+    pwm_set_gpio_level(LED_BLUE, brightness);
+
+    if ( !set_picortc_from_ds3231() ) {
+        time_ok = 1;
+    }
 
     /* Red light indicates DS3231 */
+    sleep_ms(500);
     if ( ds3231_found() ) {
         pwm_set_gpio_level(LED_RED, brightness);
     }
 
     /* Green light indicates RP2040 RTC */
+    sleep_ms(500);
     if ( rtc_running() ) {
         pwm_set_gpio_level(LED_GREEN, brightness);
     }
@@ -205,10 +209,7 @@ int main()
     set_board_led(0);
     pwm_set_gpio_level(LED_GREEN, 0);
     pwm_set_gpio_level(LED_RED, 0);
-
-    if ( !set_picortc_from_ds3231() ) {
-        time_ok = 1;
-    }
+    pwm_set_gpio_level(LED_BLUE, 0);
 
     terminal_init();
 
@@ -243,11 +244,12 @@ int main()
         /* Determine the LED status */
         if ( gpio_get(TEST_BUTTON) == 0 ) {
             /* Button pressed */
-            pwm_set_gpio_level(LED_GREEN, all_ok(ntp_state)?brightness:0);
-            pwm_set_gpio_level(LED_RED, ntp_err(ntp_state)?brightness:0);
+            pwm_set_gpio_level(LED_GREEN, (time_ok && rtc_running())?brightness:0);
+            pwm_set_gpio_level(LED_RED, ntp_ok(ntp_state)?brightness:0);
 #ifdef PICO_W
-            cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,
-                    (st == CYW43_LINK_JOIN));
+            set_board_led(st == CYW43_LINK_JOIN);
+#else
+            set_board_led(1);
 #endif
         } else {
             /* Normal operation */
