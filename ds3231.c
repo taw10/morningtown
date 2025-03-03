@@ -59,7 +59,7 @@ static int clear_32khz_bit()
 
 void ds3231_init()
 {
-    i2c_init(i2c0, 1000000);
+    i2c_init(i2c0, 200000);
     gpio_set_function(4, GPIO_FUNC_I2C);
     gpio_set_function(5, GPIO_FUNC_I2C);
     gpio_pull_up(4);
