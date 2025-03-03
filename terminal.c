@@ -42,6 +42,7 @@ static void set_clock(const char *str)
     if ( sscanf(str, "%i %i %i %i %i %i %i", &dow, &d, &mon, &y, &h, &m, &s) == 7 ) {
 
         datetime_t t;
+        bool r;
 
         printf("OK %i-%i-%i (%i), %i:%i:%i\n", d, mon, y, dow, h, m, s);
 
@@ -52,7 +53,11 @@ static void set_clock(const char *str)
         t.hour = h;
         t.min = m;
         t.sec = s;
-        rtc_set_datetime(&t);
+        if ( !rtc_set_datetime(&t) ) {
+            printf("rtc set failed\n");
+        } else {
+            printf("OK!\n");
+        }
 
     } else {
         printf("Syntax: set <weekday> <day> <mon> <yyyy> <hour> <min> <sec>\n");
