@@ -92,11 +92,11 @@ static int last_sunday_in_october(time_t year)
  */
 static int dst(datetime_t t)
 {
-    /* April to September inclusive.  Note Jan=0 */
-    if ( (t.month >= 3) && (t.month <= 8) ) return 1;
+    /* April to September inclusive. */
+    if ( (t.month >= 4) && (t.month <= 9) ) return 1;
 
-    if ( (t.month == 2) && (t.day >= last_sunday_in_march(t.year)) ) return 1;
-    if ( (t.month == 9) && (t.day < last_sunday_in_october(t.year)) ) return 1;
+    if ( (t.month == 3) && (t.day >= last_sunday_in_march(t.year)) ) return 1;
+    if ( (t.month == 8) && (t.day < last_sunday_in_october(t.year)) ) return 1;
 
     return 0;
 }
