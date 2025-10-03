@@ -96,7 +96,7 @@ static int dst(datetime_t t)
     if ( (t.month >= 4) && (t.month <= 9) ) return 1;
 
     if ( (t.month == 3) && (t.day >= last_sunday_in_march(t.year)) ) return 1;
-    if ( (t.month == 8) && (t.day < last_sunday_in_october(t.year)) ) return 1;
+    if ( (t.month == 10) && (t.day < last_sunday_in_october(t.year)) ) return 1;
 
     return 0;
 }
