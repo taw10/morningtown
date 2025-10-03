@@ -108,7 +108,7 @@ static void run_command(struct terminal *trm)
         printf("  set    : Set UTC date/time\n");
         printf("  ds     : Show DS3231 date/time and status\n");
         printf("  setds  : Set DS3231 from Pico RTC\n");
-        printf("  osf    : Set DS3231 from Pico RTC\n");
+        printf("  osf    : Reset DS3231 stop flag\n");
 
     } else {
         printf("Command not recognised.  Try 'help'\n");
