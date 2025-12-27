@@ -20,4 +20,7 @@
  *
  */
 
-extern void terminal_init(void);
+typedef struct terminal Terminal;
+
+extern Terminal *terminal_init(void);
+extern void terminal_poll(Terminal *trm);

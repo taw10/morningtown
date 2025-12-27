@@ -211,7 +211,7 @@ int main()
     pwm_set_gpio_level(LED_RED, 0);
     pwm_set_gpio_level(LED_BLUE, 0);
 
-    terminal_init();
+    Terminal *trm = terminal_init();
 
     ntp_state = ntp_init();
     last_conn = 20000;
@@ -262,7 +262,14 @@ int main()
 #ifdef PICO_W
         cyw43_arch_poll();
 #endif
-        sleep_ms(100);
+        terminal_poll(trm);
+        if ( stdio_usb_connected() ) {
+            set_board_led(1);
+            sleep_ms(10);
+        } else {
+            set_board_led(0);
+            sleep_ms(100);
+        }
 
     }
 }

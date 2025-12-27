@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "ds3231.h"
+#include "terminal.h"
 
 struct terminal
 {
@@ -117,9 +118,8 @@ static void run_command(struct terminal *trm)
 }
 
 
-static void chars_avail(void *vp)
+void terminal_poll(Terminal *trm)
 {
-    struct terminal *trm = vp;
     int i;
 
     i = getchar_timeout_us(0);
@@ -152,10 +152,10 @@ static void chars_avail(void *vp)
 }
 
 
-void terminal_init()
+Terminal *terminal_init()
 {
     struct terminal *trm = &terminal_data;
     trm->nchar = 0;
     printf("\n\nmorningtown> ");
-    stdio_set_chars_available_callback(chars_avail, trm);
+    return trm;
 }
