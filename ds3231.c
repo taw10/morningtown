@@ -94,7 +94,7 @@ void set_ds3231_from_picortc()
     buf[1] = to_bcd(t.sec);
     buf[2] = to_bcd(t.min);
     buf[3] = to_bcd(t.hour);
-    buf[4] = t.dotw;
+    buf[4] = t.dotw+1;  /* DS3231 defines range as 1..7, Pico says 0..6 */
     buf[5] = to_bcd(t.day);
     buf[6] = to_bcd(t.month);
     buf[7] = to_bcd(t.year%100);
@@ -120,7 +120,7 @@ int ds3231_get_datetime(datetime_t *t)
     t->year = 2000+from_bcd(buf[6]);
     t->month = from_bcd(buf[5] & 0x1f);
     t->day = from_bcd(buf[4]);
-    t->dotw = buf[3];
+    t->dotw = buf[3]-1;  /* DS3231 defines range as 1..7, Pico says 0..6 */
     t->hour = from_bcd(buf[2]);
     t->min = from_bcd(buf[1]);
     t->sec = from_bcd(buf[0]);

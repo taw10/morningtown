@@ -63,6 +63,22 @@ static void set_clock(const char *str)
     } else {
         printf("Syntax: set <weekday> <day> <mon> <yyyy> <hour> <min> <sec>\n");
         printf("Note: Time should be in UTC\n");
+        printf("<weekday> = 0..6 for Sunday..Saturday\n");
+    }
+}
+
+
+static const char *dotw_pico(int n)
+{
+    switch (n) {
+        case 0 : return "Sunday";
+        case 1 : return "Monday";
+        case 2 : return "Tuesday";
+        case 3 : return "Wednesday";
+        case 4 : return "Thursday";
+        case 5 : return "Friday";
+        case 6 : return "Saturday";
+        default : return "UNKNOWN";
     }
 }
 
@@ -73,8 +89,8 @@ static void print_datetime()
     int r;
     r = rtc_get_datetime(&t);
     if ( r ) {
-        printf("Pico RTC date/time (UTC): %i-%i-%i (%i)  %i:%i:%i\n",
-               t.day, t.month, t.year, t.dotw, t.hour, t.min, t.sec);
+        printf("Pico RTC date/time (UTC): %i-%i-%i (%s)  %i:%i:%i\n",
+               t.day, t.month, t.year, dotw_pico(t.dotw), t.hour, t.min, t.sec);
     } else {
         printf("Pico RTC not running.\n");
     }
