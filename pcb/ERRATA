@@ -1,3 +1,9 @@
+Revision 1.2
+============
+
+Missing pull-up resistors for I2C interface.
+
+
 Revision 1.0
 ============
 
