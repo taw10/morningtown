@@ -1,16 +1,27 @@
 #!/bin/sh
 
-export PICO_SDK_PATH=/mnt/datassd/2023/pico/pico-sdk/
+# Set path to Pico SDK here
+export PICO_SDK_PATH=~/pico-sdk
+
 rm -rf build
 mkdir build
 cd build
-cmake .. -DPICO_BOARD=pico_w \
-         -DWIFI_SSID=MyWifi \
-         -DWIFI_PASSWORD=MyPassword
+
+# For WLAN/NTP-enabled version:
+#  -DPICO_BOARD=pico_w
+#  -DWIFI_SSID=MyWifi \
+#  -DWIFI_PASSWORD=MyPassword
+
+# For USB console (otherwise UART): -DUSB_SERIAL=1
+
+cmake .. -DPICO_BOARD=pico -DUSB_SERIAL=1
+
 if [ $? != 0 ]; then exit 1; fi
 cd ..
 
 make -C build
 if [ $? != 0 ]; then exit 1; fi
 
-openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000" -c "program build/morningtown.elf verify reset exit"
+# Uncomment to upload via debug interface
+# Otherwise, copy build/morningtown.uf2 to the Pico as usual
+#openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000" -c "program build/morningtown.elf verify reset exit"
