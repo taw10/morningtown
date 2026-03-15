@@ -1,0 +1,8 @@
+Revision 1.0
+============
+
+The DS3231 RTC's Vcc and Vbat are swapped.
+
+The cut-out for the Pico W antenna is too close to the USB socket end.
+
+The schematic labels for red and green LEDs are reversed.
