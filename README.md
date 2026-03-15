@@ -4,11 +4,10 @@ MorningTown: A silent alarm clock
 Description
 -----------
 
-MorningTown is a silent alarm clock system for a Raspberry Pi Pico W.
+MorningTown is a silent alarm clock system based on a Raspberry Pi Pico.
 
 At 7:15am, it lights a single green LED.  At 8am, it additionally lights a red
-LED.  Around midday, it turns them both off.  It does literally nothing else.
-Oh, apart from synchronising the Pico's real-time clock using NTP.
+LED.  Around midday, it turns them both off.  It does practically nothing else.
 
 
 Why???
@@ -36,27 +35,33 @@ to synchronise your sleep pattern!
 Hardware
 --------
 
-You'll need a Raspberry Pi Pico W.  Solder red and green LEDs to GPIOs 22 and
-21 respectively, each with a 1.5 kOhm series resistor (you won't need much
-brightness).  There is a ground pad conveniently placed between the two pins.
+For a 'deluxe' implementation, send the circuit board design in the `pcb`
+folder ([KiCad](https://www.kicad.org/) format) to your manufacturer of choice
+(I have been using [Aisler](https://aisler.net/).
+
+For a 'cheap and cheerful' version, simply solder red and green LEDs to GPIOs
+22 and 21 respectively of a Raspberry Pi Pico W, each with a 1.5 kOhm series
+resistor (you won't need much brightness).  There is a ground pad conveniently
+placed between these two pins.
 
 ![Circuit diagram](circuit.png)    ![Photo](photo.jpg)
 
 (Hopefully your soldering is a little neater than mine).
 
-Optionally solder a small button between GPIO 16 and GND.  This will be a test
-button for checking the device is working properly (not illustrated above).
+You can use other colours if you prefer, of course, or different GPIOs - just
+change the definitions of `LED_RED`, `LED_GREEN` and `TEST_BUTTON` in
+`firmware/morningtown.c`.
 
-You can use other GPIOs if you prefer - just change the definitions of
-`LED_RED`, `LED_GREEN` and `TEST_BUTTON` in `morningtown.c`.  The positions of
-16, 21 and 22 just happen to work well for the geometry of my own nightstand.
+The custom PCB design adds a battery-backed real-time clock chip, which keeps
+time when power is removed from the Pi Pico.  With the 'cheap and cheerful'
+option, the Pico will instead need to synchronise itself using NTP.
 
 
-Software
+Firmware
 --------
 
 Edit `compile` to set the path to the [Pico SDK](https://github.com/raspberrypi/pico-sdk),
-as well as your WLAN name and password.
+as well as your WLAN name and password if you are using a Pico W.
 
 The wake-up times, as well as UTC offsets and DST changeover, are set in
 routine `check_clock()` in `morningtown.c`.  By default the calculations are
@@ -71,14 +76,15 @@ Run `compile`, then copy `build/morningtown.uf2` to the Pico.
 Operation
 ---------
 
-Connect the Pico to any USB power supply.  All three LEDs (red, green and the
-one on Pi board itself) will light briefly.  The device will then attempt to
-connect to the WLAN and synchronise its clock
+Connect the Pico to any USB power supply.  The board LED will light briefly,
+followed by the red LED (if a DS3231 real-time clock is detected) and green
+(to indicate the Pico's RTC is running).  If applicable, the device will then
+attempt to connect to the WLAN and synchronise its clock
 
-When the (optional) test button is pressed (and held), the board LED will
-indicate a current WLAN connection, the green LED will indicate that NTP is
-synchronised, and the red LED (hopefully not lit) indicates some kind of error
-condition.
+When the (optional) test button is held, the LEDs indicate as follows:
+* Red: NTP synchronised if applicable, otherwise always on.
+* Green: RTC time OK (regardless of source).
+* Board LED: WLAN connected if applicable, otherwise always on.
 
 
 Licence
@@ -111,4 +117,4 @@ It's like a railway signal for your sleep:
 > Somewhere there is Morning town  
 > Many miles away
 
-- [The Seekers, 1966](https://www.youtube.com/watch?v=lsqNcZ1JqW8)
+- [Malvina Reynolds](https://en.wikipedia.org/wiki/Morningtown_Ride)
