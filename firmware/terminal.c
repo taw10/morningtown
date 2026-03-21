@@ -27,6 +27,7 @@
 
 #include "ds3231.h"
 #include "terminal.h"
+#include "settings.h"
 
 struct terminal
 {
@@ -118,6 +119,12 @@ static void run_command(struct terminal *trm)
     } else if ( strcmp(trm->c, "osf") == 0 ) {
         ds3231_reset_osf();
 
+    } else if ( strcmp(trm->c, "load") == 0 ) {
+        settings_read();
+
+    } else if ( strcmp(trm->c, "save") == 0 ) {
+        settings_write();
+
     } else if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
         printf("  help   : Show this help message\n");
@@ -126,6 +133,8 @@ static void run_command(struct terminal *trm)
         printf("  ds     : Show DS3231 date/time and status\n");
         printf("  setds  : Set DS3231 from Pico RTC\n");
         printf("  osf    : Reset DS3231 stop flag\n");
+        printf("  load   : Load settings\n");
+        printf("  save   : Save settings\n");
 
     } else {
         printf("Command not recognised.  Try 'help'\n");

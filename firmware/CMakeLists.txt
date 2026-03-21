@@ -11,7 +11,7 @@ option(USB_SERIAL "Enable serial console over USB (otherwise via UART)" ON)
 # Initialize the SDK
 pico_sdk_init()
 
-add_executable(morningtown morningtown.c terminal.c ds3231.c)
+add_executable(morningtown morningtown.c terminal.c ds3231.c settings.c)
 
 if (USB_SERIAL)
   pico_enable_stdio_usb(morningtown ENABLED)
@@ -23,7 +23,9 @@ target_link_libraries(morningtown
                       pico_stdlib
                       hardware_rtc
                       hardware_pwm
-                      hardware_i2c)
+                      hardware_i2c
+                      hardware_sync
+                      hardware_flash)
 
 string(COMPARE EQUAL ${PICO_BOARD} "pico_w" _cmp)
 if (_cmp)
