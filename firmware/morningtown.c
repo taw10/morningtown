@@ -36,18 +36,9 @@
 #include "ntp_client.h"
 #include "terminal.h"
 #include "ds3231.h"
+#include "settings.h"
 
-/* For cheap and cheerful hardware solution:
- * #define LED_GREEN 21
- * #define LED_RED 22
- *
- * For custom PCB:
- * #define LED_GREEN 19
- * #define LED_RED 22
- */
-#define LED_GREEN 19
 #define LED_BLUE 21
-#define LED_RED 22
 #define TEST_BUTTON 16
 
 /* Hard-coded calculations because I can't be bothered to work out all the
@@ -182,8 +173,10 @@ int main()
     gpio_set_dir(TEST_BUTTON, GPIO_IN);
     gpio_pull_up(TEST_BUTTON);
 
-    setup_pwm(LED_GREEN);
-    setup_pwm(LED_RED);
+    settings_read();
+
+    setup_pwm(settings.morning_pin);
+    setup_pwm(settings.late_pin);
     setup_pwm(LED_BLUE);
 
     pwm_set_gpio_level(LED_BLUE, brightness);
@@ -195,20 +188,20 @@ int main()
     /* Red light indicates DS3231 */
     sleep_ms(500);
     if ( ds3231_found() ) {
-        pwm_set_gpio_level(LED_RED, brightness);
+        pwm_set_gpio_level(settings.late_pin, brightness);
     }
 
     /* Green light indicates RP2040 RTC */
     sleep_ms(500);
     if ( rtc_running() ) {
-        pwm_set_gpio_level(LED_GREEN, brightness);
+        pwm_set_gpio_level(settings.morning_pin, brightness);
     }
 
     /* Wait, then turn everything off */
     sleep_ms(2000);
     set_board_led(0);
-    pwm_set_gpio_level(LED_GREEN, 0);
-    pwm_set_gpio_level(LED_RED, 0);
+    pwm_set_gpio_level(settings.morning_pin, 0);
+    pwm_set_gpio_level(settings.late_pin, 0);
     pwm_set_gpio_level(LED_BLUE, 0);
 
     Terminal *trm = terminal_init();
@@ -244,8 +237,8 @@ int main()
         /* Determine the LED status */
         if ( gpio_get(TEST_BUTTON) == 0 ) {
             /* Button pressed */
-            pwm_set_gpio_level(LED_GREEN, (time_ok && rtc_running())?brightness:0);
-            pwm_set_gpio_level(LED_RED, ntp_ok(ntp_state)?brightness:0);
+            pwm_set_gpio_level(settings.morning_pin, (time_ok && rtc_running())?brightness:0);
+            pwm_set_gpio_level(settings.late_pin, ntp_ok(ntp_state)?brightness:0);
 #ifdef PICO_W
             set_board_led(st == CYW43_LINK_JOIN);
 #else
@@ -253,8 +246,8 @@ int main()
 #endif
         } else {
             /* Normal operation */
-            pwm_set_gpio_level(LED_GREEN, (pre_wake||wake_now)?brightness:0);
-            pwm_set_gpio_level(LED_RED, wake_now?brightness:0);
+            pwm_set_gpio_level(settings.morning_pin, (pre_wake||wake_now)?brightness:0);
+            pwm_set_gpio_level(settings.late_pin, wake_now?brightness:0);
             set_board_led(0);
         }
 

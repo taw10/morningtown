@@ -38,6 +38,19 @@ struct terminal
 struct terminal terminal_data;
 
 
+static void set_pins(const char *str)
+{
+    int morning, late;
+    if ( sscanf(str, "%i %i", &morning, &late) == 2 ) {
+        settings.morning_pin = morning;
+        settings.late_pin = late;
+    } else {
+        printf("Syntax: leds <morning> <late>\n");
+        printf("Default assignments: leds 19 22\n");
+    }
+}
+
+
 static void set_clock(const char *str)
 {
     int dow, d, mon, y, h, m, s;
@@ -125,16 +138,24 @@ static void run_command(struct terminal *trm)
     } else if ( strcmp(trm->c, "save") == 0 ) {
         settings_write();
 
+    } else if ( strcmp(trm->c, "settings") == 0 ) {
+        settings_show();
+
+    } else if ( strncmp(trm->c, "leds ", 5) == 0 ) {
+        set_pins(trm->c+5);
+
     } else if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
-        printf("  help   : Show this help message\n");
-        printf("  tt     : Show Pico RTC date/time\n");
-        printf("  set    : Set UTC date/time\n");
-        printf("  ds     : Show DS3231 date/time and status\n");
-        printf("  setds  : Set DS3231 from Pico RTC\n");
-        printf("  osf    : Reset DS3231 stop flag\n");
-        printf("  load   : Load settings\n");
-        printf("  save   : Save settings\n");
+        printf("  help     : Show this help message\n");
+        printf("  tt       : Show Pico RTC date/time\n");
+        printf("  set      : Set UTC date/time\n");
+        printf("  ds       : Show DS3231 date/time and status\n");
+        printf("  setds    : Set DS3231 from Pico RTC\n");
+        printf("  osf      : Reset DS3231 stop flag\n");
+        printf("  load     : Load settings\n");
+        printf("  save     : Save settings\n");
+        printf("  settings : Show settings\n");
+        printf("  leds     : Set wake LED pin assignments\n");
 
     } else {
         printf("Command not recognised.  Try 'help'\n");

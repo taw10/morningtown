@@ -42,6 +42,19 @@ static void settings_default(struct mt_settings *s)
     s->late_hour = 8;
     s->late_min = 0;
     s->clear_hour = 12;
+    s->morning_pin = 19;  /* Use 21 for cheap and cheerful hardware */
+    s->late_pin = 22;
+}
+
+
+void settings_show()
+{
+    printf("Settings version %i\n", settings.version);
+    printf(" Wake after %i:%i\n", settings.morning_hour, settings.morning_min);
+    printf(" Rise before %i:%i\n", settings.late_hour, settings.late_min);
+    printf(" Clear LEDs at %i:00\n", settings.clear_hour);
+    printf(" Local time is UTC + %i hours\n", settings.utc_offset);
+    printf(" LED assignments wake=%i, rise=%i\n", settings.morning_pin, settings.late_pin);
 }
 
 

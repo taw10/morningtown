@@ -40,3 +40,4 @@ struct mt_settings
 extern struct mt_settings settings;
 extern int settings_read(void);
 extern int settings_write(void);
+extern void settings_show(void);
