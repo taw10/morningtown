@@ -69,7 +69,7 @@ static void set_clock(const char *str)
         t.min = m;
         t.sec = s;
         if ( !rtc_set_datetime(&t) ) {
-            printf("rtc set failed\n");
+            printf("RTC set failed\n");
         } else {
             printf("OK!\n");
         }
