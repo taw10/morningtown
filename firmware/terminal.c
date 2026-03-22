@@ -204,7 +204,7 @@ static void run_command(struct terminal *trm)
         set_utc_offset(trm->c+3);
 
     } else if ( strncmp(trm->c, "clear ", 6) == 0 ) {
-        set_utc_offset(trm->c+6);
+        set_clear_time(trm->c+6);
 
     } else if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
@@ -220,6 +220,7 @@ static void run_command(struct terminal *trm)
         printf("  leds     : Set wake LED pin assignments\n");
         printf("  wake     : Set waking time (green)\n");
         printf("  rise     : Set rise/late time (red)\n");
+        printf("  tz       : Set UTC offset\n");
         printf("  clear    : Set wake LED reset time\n");
 
     } else {
