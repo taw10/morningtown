@@ -89,6 +89,18 @@ static void set_utc_offset(const char *str)
 }
 
 
+static void set_clear_time(const char *str)
+{
+    int hours;
+    if ( sscanf(str, "%i", &hours) == 1 ) {
+        settings.clear_hour = hours;
+    } else {
+        printf("Syntax: clear <hours>\n");
+        printf("Default: clear 12\n");
+    }
+}
+
+
 static void set_clock(const char *str)
 {
     int dow, d, mon, y, h, m, s;
@@ -191,6 +203,9 @@ static void run_command(struct terminal *trm)
     } else if ( strncmp(trm->c, "tz ", 3) == 0 ) {
         set_utc_offset(trm->c+3);
 
+    } else if ( strncmp(trm->c, "clear ", 6) == 0 ) {
+        set_utc_offset(trm->c+6);
+
     } else if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
         printf("  help     : Show this help message\n");
@@ -205,6 +220,7 @@ static void run_command(struct terminal *trm)
         printf("  leds     : Set wake LED pin assignments\n");
         printf("  wake     : Set waking time (green)\n");
         printf("  rise     : Set rise/late time (red)\n");
+        printf("  clear    : Set wake LED reset time\n");
 
     } else {
         printf("Command not recognised.  Try 'help'\n");
