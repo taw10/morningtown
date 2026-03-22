@@ -169,6 +169,21 @@ static void print_flag(uint8_t byte, int bit, const char *name)
 }
 
 
+int ds3231_osf_set()
+{
+    uint8_t buf[19];
+    int r;
+    buf[0] = 0x00;
+    i2c_write_blocking(i2c_default, 0x68, buf, 1, true);
+    r = i2c_read_blocking(i2c_default, 0x68, buf, 19, false);
+    if ( r == PICO_ERROR_GENERIC ) {
+        printf("DS3231 not found\n");
+        return 0;
+    }
+    return buf[15] & 1<<7;
+}
+
+
 void ds3231_status()
 {
     uint8_t buf[19];

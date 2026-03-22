@@ -191,6 +191,16 @@ int main()
         pwm_set_gpio_level(settings.late_pin, brightness);
     }
 
+    if ( ds3231_osf_set() ) {
+        int i;
+        for ( i=0; i<25; i++ ) {
+            pwm_set_gpio_level(settings.late_pin, brightness);
+            sleep_ms(100);
+            pwm_set_gpio_level(settings.late_pin, 0);
+            sleep_ms(100);
+        }
+    }
+
     /* Green light indicates RP2040 RTC */
     sleep_ms(500);
     if ( rtc_running() ) {
