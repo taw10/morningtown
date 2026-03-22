@@ -46,7 +46,45 @@ static void set_pins(const char *str)
         settings.late_pin = late;
     } else {
         printf("Syntax: leds <morning> <late>\n");
-        printf("Default assignments: leds 19 22\n");
+        printf("Default: leds 19 22\n");
+    }
+}
+
+
+static void set_wake(const char *str)
+{
+    int hours, mins;
+    if ( sscanf(str, "%i %i", &hours, &mins) == 2 ) {
+        settings.morning_hour = hours;
+        settings.morning_min = mins;
+    } else {
+        printf("Syntax: wake <hh> <mm>\n");
+        printf("Default: wake 7 15\n");
+    }
+}
+
+
+static void set_rise(const char *str)
+{
+    int hours, mins;
+    if ( sscanf(str, "%i %i", &hours, &mins) == 2 ) {
+        settings.late_hour = hours;
+        settings.late_min = mins;
+    } else {
+        printf("Syntax: rise <hh> <mm>\n");
+        printf("Default: wake 8 0\n");
+    }
+}
+
+
+static void set_utc_offset(const char *str)
+{
+    int hours;
+    if ( sscanf(str, "%i", &hours) == 1 ) {
+        settings.utc_offset = hours;
+    } else {
+        printf("Syntax: tz <hours>\n");
+        printf("Default (for CET/CEST): tz 1\n");
     }
 }
 
@@ -144,6 +182,15 @@ static void run_command(struct terminal *trm)
     } else if ( strncmp(trm->c, "leds ", 5) == 0 ) {
         set_pins(trm->c+5);
 
+    } else if ( strncmp(trm->c, "wake ", 5) == 0 ) {
+        set_wake(trm->c+5);
+
+    } else if ( strncmp(trm->c, "rise ", 5) == 0 ) {
+        set_rise(trm->c+5);
+
+    } else if ( strncmp(trm->c, "tz ", 3) == 0 ) {
+        set_utc_offset(trm->c+3);
+
     } else if ( strcmp(trm->c, "help") == 0 ) {
         printf("Commands:\n");
         printf("  help     : Show this help message\n");
@@ -156,6 +203,8 @@ static void run_command(struct terminal *trm)
         printf("  save     : Save settings\n");
         printf("  settings : Show settings\n");
         printf("  leds     : Set wake LED pin assignments\n");
+        printf("  wake     : Set waking time (green)\n");
+        printf("  rise     : Set rise/late time (red)\n");
 
     } else {
         printf("Command not recognised.  Try 'help'\n");

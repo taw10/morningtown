@@ -102,16 +102,20 @@ static void check_clock(int *pre_wake, int *wake_now)
         rtc_get_datetime(&t);
     }
 
-    /* Time offsets for CET/CEST (Europe) */
-    dstoffs = dst(t) ? 2 : 1;
+    dstoffs = settings.utc_offset + dst(t) ? 1 : 0;
 
-    /* Set wakeup times here */
-    if ( (t.hour == 7-dstoffs) && (t.min >= 15) ) {
-        *pre_wake = 1;
+    if ( t.hour >= settings.clear_hour-dstoffs ) {
+        *pre_wake = 0;
         *wake_now = 0;
-    } else if ( (t.hour >= 8-dstoffs) && (t.hour < 12) ) {
+
+    } else if ( (t.hour >= settings.late_hour-dstoffs) && (t.min >= settings.late_min) ) {
         *pre_wake = 0;
         *wake_now = 1;
+
+    } else if ( (t.hour >= settings.morning_hour-dstoffs) && (t.min >= settings.morning_min) ) {
+        *pre_wake = 1;
+        *wake_now = 0;
+
     } else {
         *pre_wake = 0;
         *wake_now = 0;

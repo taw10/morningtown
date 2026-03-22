@@ -33,6 +33,7 @@ struct mt_settings
     uint32_t utc_offset;
     uint32_t morning_pin;
     uint32_t late_pin;
+
     char pad[54];  /* Pad to at least FLASH_PAGE_SIZE */
 };
 
