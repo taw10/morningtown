@@ -62,7 +62,7 @@ void settings_show()
 int settings_read()
 {
     int i;
-    struct mt_settings *sp;
+    struct mt_settings *sp = NULL;
     int max_version = 0;
 
     printf("Sector size = %li\n", FLASH_SECTOR_SIZE);
@@ -92,6 +92,7 @@ int settings_read()
         printf("Found settings version %i at %p\n", sp->version, sp);
         settings = *sp;
     } else {
+        printf("No settings found, using defaults\n");
         settings_default(&settings);
     }
 
