@@ -28,6 +28,7 @@
 #include <hardware/rtc.h>
 #include <hardware/i2c.h>
 
+#include "settings.h"
 
 static int have_ds3231 = 0;
 
@@ -208,6 +209,7 @@ void ds3231_status()
     t.sec = from_bcd(buf[0]);
     printf("Time: %2i:%2i:%2i  Date: %i/%i/%i  DoW=%i\n",
             t.hour, t.min, t.sec, t.day, t.month, t.year, t.dotw);
+    printf("Offset to local time: %i + %i\n", settings.utc_offset, dst(t));
 
     printf("Flags: ");
     print_flag(buf[14], 7, "/EOSC");

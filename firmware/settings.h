@@ -42,3 +42,4 @@ extern struct mt_settings settings;
 extern int settings_read(void);
 extern int settings_write(void);
 extern void settings_show(void);
+extern int dst(datetime_t t);

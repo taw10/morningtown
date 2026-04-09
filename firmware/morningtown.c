@@ -41,58 +41,6 @@
 #define LED_BLUE 21
 #define TEST_BUTTON 16
 
-/* Hard-coded calculations because I can't be bothered to work out all the
- * special cases (leap years etc).  There's a decent chance that DST will have
- * been abolished in Europe by the time this table runs out, anyway.
- */
-static int last_sunday_in_march(time_t year)
-{
-    switch ( year ) {
-        case 2024: return 31;
-        case 2025: return 30;
-        case 2026: return 29;
-        case 2027: return 28;
-        case 2028: return 26;
-        case 2029: return 25;
-        case 2030: return 31;
-        default: return 28;  /* Guess! */
-    }
-}
-
-
-static int last_sunday_in_october(time_t year)
-{
-    switch ( year ) {
-        case 2024: return 27;
-        case 2025: return 26;
-        case 2026: return 25;
-        case 2027: return 31;
-        case 2028: return 29;
-        case 2029: return 28;
-        case 2030: return 27;
-        default: return 27;  /* Guess! */
-    }
-}
-
-
-/* This is about the simplest possible case of local time handling, and it
- * still makes me want to hurl.  Ugh.
- *
- * Note that we don't care about the *time* of switching to/from DST (01:00 in
- * Europe), because the wakeup time is usually much later.
- */
-static int dst(datetime_t t)
-{
-    /* April to September inclusive. */
-    if ( (t.month >= 4) && (t.month <= 9) ) return 1;
-
-    if ( (t.month == 3) && (t.day >= last_sunday_in_march(t.year)) ) return 1;
-    if ( (t.month == 10) && (t.day < last_sunday_in_october(t.year)) ) return 1;
-
-    return 0;
-}
-
-
 static void check_clock(int *pre_wake, int *wake_now)
 {
     time_t dstoffs;

@@ -158,6 +158,7 @@ static void print_datetime()
     } else {
         printf("Pico RTC not running.\n");
     }
+    printf("Offset to local time: %i + %i\n", settings.utc_offset, dst(t));
 }
 
 
