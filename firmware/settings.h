@@ -30,7 +30,7 @@ struct mt_settings
     uint32_t late_hour;
     uint32_t late_min;
     uint32_t clear_hour;
-    uint32_t utc_offset;
+    int32_t utc_offset;
     uint32_t morning_pin;
     uint32_t late_pin;
 
@@ -42,4 +42,4 @@ extern struct mt_settings settings;
 extern int settings_read(void);
 extern int settings_write(void);
 extern void settings_show(void);
-extern int dst(datetime_t t);
+extern int32_t dst(datetime_t t);

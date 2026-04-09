@@ -179,7 +179,7 @@ static int last_sunday_in_october(time_t year)
  * Note that we don't care about the *time* of switching to/from DST (01:00 in
  * Europe), because the wakeup time is usually much later.
  */
-int dst(datetime_t t)
+int32_t dst(datetime_t t)
 {
     /* April to September inclusive. */
     if ( (t.month >= 4) && (t.month <= 9) ) return 1;

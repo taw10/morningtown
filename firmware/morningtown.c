@@ -43,14 +43,14 @@
 
 static void check_clock(int *pre_wake, int *wake_now)
 {
-    time_t dstoffs;
+    int32_t dstoffs;
     datetime_t t = {0};
 
     if ( ds3231_get_datetime(&t) ) {
         rtc_get_datetime(&t);
     }
 
-    dstoffs = settings.utc_offset + dst(t) ? 1 : 0;
+    dstoffs = settings.utc_offset + dst(t);
 
     if ( t.hour >= settings.clear_hour-dstoffs ) {
         *pre_wake = 0;
